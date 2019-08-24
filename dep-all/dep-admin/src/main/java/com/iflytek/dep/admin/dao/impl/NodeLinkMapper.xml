@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.admin.dao.NodeLinkMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.admin.model.NodeLink">
+    <id column="LINK_ID" jdbcType="VARCHAR" property="linkId" />
+    <result column="PACKAGE_ID" jdbcType="VARCHAR" property="packageId" />
+    <result column="TO_NODE_ID" jdbcType="VARCHAR" property="toNodeId" />
+    <result column="LEFT_NODE_ID" jdbcType="VARCHAR" property="leftNodeId" />
+    <result column="RIGHT_NODE_ID" jdbcType="VARCHAR" property="rightNodeId" />
+    <result column="ORDER_ID" jdbcType="DECIMAL" property="orderId" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from NODE_LINK
+    where LINK_ID = #{linkId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.admin.model.NodeLink">
+    insert into NODE_LINK (LINK_ID, PACKAGE_ID, TO_NODE_ID, 
+      LEFT_NODE_ID, RIGHT_NODE_ID, ORDER_ID
+      )
+    values (#{linkId,jdbcType=VARCHAR}, #{packageId,jdbcType=VARCHAR}, #{toNodeId,jdbcType=VARCHAR}, 
+      #{leftNodeId,jdbcType=VARCHAR}, #{rightNodeId,jdbcType=VARCHAR}, #{orderId,jdbcType=DECIMAL}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.admin.model.NodeLink">
+    update NODE_LINK
+    set PACKAGE_ID = #{packageId,jdbcType=VARCHAR},
+      TO_NODE_ID = #{toNodeId,jdbcType=VARCHAR},
+      LEFT_NODE_ID = #{leftNodeId,jdbcType=VARCHAR},
+      RIGHT_NODE_ID = #{rightNodeId,jdbcType=VARCHAR},
+      ORDER_ID = #{orderId,jdbcType=DECIMAL}
+    where LINK_ID = #{linkId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select LINK_ID, PACKAGE_ID, TO_NODE_ID, LEFT_NODE_ID, RIGHT_NODE_ID, ORDER_ID
+    from NODE_LINK
+    where LINK_ID = #{linkId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select LINK_ID, PACKAGE_ID, TO_NODE_ID, LEFT_NODE_ID, RIGHT_NODE_ID, ORDER_ID
+    from NODE_LINK
+  </select>
+  <select id="selectToNodesByPackageId" parameterType="java.lang.String" resultType="java.lang.String">
+    select distinct TO_NODE_ID from NODE_LINK
+    where PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByPackageId"  resultType="com.iflytek.dep.admin.model.vo.NodeLinkVo">
+    select t.LINK_ID as linkId, t.PACKAGE_ID as packageId,
+    t.TO_NODE_ID as toNodeId,
+    t.LEFT_NODE_ID as leftNodeId, t1.node_remark as leftNodeRemark,
+    t1.server_node_id as serverNodeId,
+    t.RIGHT_NODE_ID as rightNodeId,
+    t.ORDER_ID as orderId
+    from NODE_LINK t
+    left join MACHINE_NODE t1 on t.LEFT_NODE_ID=t1.NODE_ID
+    where PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+    and TO_NODE_ID = #{toNode,jdbcType=VARCHAR}
+    order by t.ORDER_ID
+  </select>
+  <select id="selectByIds"  resultType="com.iflytek.dep.admin.model.vo.NodeLinkVo">
+    select t.LINK_ID as linkId, t.PACKAGE_ID as packageId,
+    t.TO_NODE_ID as toNodeId,
+    t.LEFT_NODE_ID as leftNodeId, t1.node_remark as leftNodeRemark,
+    t1.node_type_dm as leftNodeType,
+    t1.server_node_id as serverNodeId,
+    t.RIGHT_NODE_ID as rightNodeId,
+    t.ORDER_ID as orderId
+    from NODE_LINK t
+    left join MACHINE_NODE t1 on t.LEFT_NODE_ID=t1.NODE_ID
+    where PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+    and t1.SERVER_NODE_ID = #{serverNodeId,jdbcType=VARCHAR}
+    order by t.ORDER_ID
+  </select>
+  <select id="selectCountByNodeRoute" parameterType="com.iflytek.dep.admin.model.NodeRoute"
+          resultType="java.lang.Integer">
+    SELECT COUNT(*) FROM NODE_LINK WHERE LEFT_NODE_ID=#{leftNodeId} AND RIGHT_NODE_ID=#{rightNodeId}
+  </select>
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.admin.dao.MachineMonitorMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.admin.model.MachineMonitor">
+    <id column="MONITOR_ID" jdbcType="VARCHAR" property="monitorId" />
+    <result column="NODE_ID" jdbcType="VARCHAR" property="nodeId" />
+    <result column="PROBE_TIME" jdbcType="TIMESTAMP" property="probeTime" />
+    <result column="PROBE_RESULT" jdbcType="VARCHAR" property="probeResult" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from MACHINE_MONITOR
+    where MONITOR_ID = #{monitorId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.admin.model.MachineMonitor">
+    insert into MACHINE_MONITOR (MONITOR_ID, NODE_ID, PROBE_TIME, 
+      PROBE_RESULT)
+    values (#{monitorId,jdbcType=VARCHAR}, #{nodeId,jdbcType=VARCHAR}, #{probeTime,jdbcType=TIMESTAMP}, 
+      #{probeResult,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.admin.model.MachineMonitor">
+    update MACHINE_MONITOR
+    set NODE_ID = #{nodeId,jdbcType=VARCHAR},
+      PROBE_TIME = #{probeTime,jdbcType=TIMESTAMP},
+      PROBE_RESULT = #{probeResult,jdbcType=VARCHAR}
+    where MONITOR_ID = #{monitorId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select MONITOR_ID, NODE_ID, PROBE_TIME, PROBE_RESULT
+    from MACHINE_MONITOR
+    where MONITOR_ID = #{monitorId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select MONITOR_ID, NODE_ID, PROBE_TIME, PROBE_RESULT
+    from MACHINE_MONITOR
+  </select>
+</mapper>

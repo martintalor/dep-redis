@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.admin.dao.DataPackageMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.admin.model.DataPackage">
+    <id column="PACKAGE_ID" jdbcType="VARCHAR" property="packageId" />
+    <result column="PACKAGE_SIZE" jdbcType="DECIMAL" property="packageSize" />
+    <result column="APP_ID_FROM" jdbcType="VARCHAR" property="appIdFrom" />
+    <result column="APP_ID_TO" jdbcType="VARCHAR" property="appIdTo" />
+    <result column="FOLDER_PATH" jdbcType="VARCHAR" property="folderPath" />
+    <result column="PACKAGE_PATH" jdbcType="VARCHAR" property="packagePath" />
+    <result column="SEND_LEVEL" jdbcType="VARCHAR" property="sendLevel" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from DATA_PACKAGE
+    where PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.admin.model.DataPackage">
+    insert into DATA_PACKAGE (PACKAGE_ID, PACKAGE_SIZE, APP_ID_FROM, 
+      APP_ID_TO, FOLDER_PATH, PACKAGE_PATH, 
+      SEND_LEVEL, CREATE_TIME)
+    values (#{packageId,jdbcType=VARCHAR}, #{packageSize,jdbcType=DECIMAL}, #{appIdFrom,jdbcType=VARCHAR}, 
+      #{appIdTo,jdbcType=VARCHAR}, #{folderPath,jdbcType=VARCHAR}, #{packagePath,jdbcType=VARCHAR}, 
+      #{sendLevel,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.admin.model.DataPackage">
+    update DATA_PACKAGE
+    set PACKAGE_SIZE = #{packageSize,jdbcType=DECIMAL},
+      APP_ID_FROM = #{appIdFrom,jdbcType=VARCHAR},
+      APP_ID_TO = #{appIdTo,jdbcType=VARCHAR},
+      FOLDER_PATH = #{folderPath,jdbcType=VARCHAR},
+      PACKAGE_PATH = #{packagePath,jdbcType=VARCHAR},
+      SEND_LEVEL = #{sendLevel,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+    where PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultType="com.iflytek.dep.admin.model.vo.DataPackageVo">
+    select t.PACKAGE_ID as packageId, t.PACKAGE_SIZE as packageSize, t.CREATE_TIME as createTime,
+    t1.GLOBAL_STATE_DM as globalStateDm,
+    t1.UPDATE_TIME as updateTime,
+    (t1.UPDATE_TIME-t.CREATE_TIME)*24*3600 as spendTime,
+    t1.NODE_ID as nodeId,
+    t2.NODE_REMARK as nodeRemark
+    from DATA_PACKAGE t
+    left join PACKAGE_GLOBAL_STATE t1 on t.PACKAGE_ID=t1.PACKAGE_ID || '.zip'
+    left join MACHINE_NODE t2 on t1.NODE_ID=t2.NODE_ID
+    where t.PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+    and  t1.TO_NODE_ID = #{toNodeId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultType="com.iflytek.dep.admin.model.vo.DataPackageVo">
+    select t.PACKAGE_ID as packageId, t.PACKAGE_SIZE as packageSize, t.CREATE_TIME as createTime,
+    t1.GLOBAL_STATE_DM as globalStateDm,
+    t1.UPDATE_TIME as updateTime,
+    (t1.UPDATE_TIME-t.CREATE_TIME)*24*3600 as spendTime,
+    t1.NODE_ID as nodeId,
+    t2.NODE_REMARK as nodeRemark,
+    t2.SERVER_NODE_ID as serverNodeId,
+    t1.TO_NODE_ID as toNodeId,
+    t3.NODE_REMARK as toNodeRemark
+    from DATA_PACKAGE t
+    inner join PACKAGE_GLOBAL_STATE t1 on t.PACKAGE_ID=t1.PACKAGE_ID || '.zip'
+    inner join MACHINE_NODE t2 on t1.NODE_ID=t2.NODE_ID
+    inner join MACHINE_NODE t3 on t1.TO_NODE_ID = t3.NODE_ID
+    <where>
+      <if test="dataPackageDto.packageId != null and dataPackageDto.packageId != ''">
+        and  t.PACKAGE_ID LIKE CONCAT(CONCAT('%',#{dataPackageDto.packageId,jdbcType=VARCHAR}),'%')
+      </if>
+      <if test="dataPackageDto.appIdTo != null and dataPackageDto.appIdTo != ''">
+        and  t.APP_ID_TO LIKE CONCAT(CONCAT('%',#{dataPackageDto.appIdTo,jdbcType=VARCHAR}),'%')
+      </if>
+      <if test="dataPackageDto.globalStateDm != null and dataPackageDto.globalStateDm != ''">
+        and  t1.GLOBAL_STATE_DM LIKE CONCAT(CONCAT('%',#{dataPackageDto.globalStateDm,jdbcType=VARCHAR}),'%')
+      </if>
+      <if test="dataPackageDto.createTimeStart != null and dataPackageDto.createTimeStart != ''">
+        and to_char(t.CREATE_TIME,'yyyy-MM-dd')>=#{dataPackageDto.createTimeStart}
+      </if>
+      <if test="dataPackageDto.createTimeEnd != null and dataPackageDto.createTimeEnd != ''">
+        and to_char(t.CREATE_TIME,'yyyy-MM-dd')&lt;=#{dataPackageDto.createTimeEnd}
+      </if>
+    </where>
+    ORDER BY t.CREATE_TIME DESC
+  </select>
+  <select id="selectByPackageId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select PACKAGE_ID, PACKAGE_SIZE, APP_ID_FROM, APP_ID_TO, FOLDER_PATH, PACKAGE_PATH,
+    SEND_LEVEL, CREATE_TIME
+    from DATA_PACKAGE
+    where PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+  </select>
+  <select id="getFailPackageId"  resultType="java.lang.String">
+    select distinct PACKAGE_ID from PACKAGE_GLOBAL_STATE
+    where GLOBAL_STATE_DM = '00'
+    and PACKAGE_ID != #{packageId,jdbcType=VARCHAR}
+    and PACKAGE_ID LIKE CONCAT(CONCAT('%',#{packageId,jdbcType=VARCHAR}),'%')
+    <if test="toNodeId != null and toNodeId != ''">
+      and TO_NODE_ID = #{toNodeId,jdbcType=VARCHAR}
+    </if>
+  </select>
+</mapper>

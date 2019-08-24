@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.server.mapper.DataNodeProcessBeanMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.server.model.DataNodeProcessBean">
+    <id column="PROCESS_ID" jdbcType="VARCHAR" property="processId" />
+    <result column="PACKAGE_ID" jdbcType="VARCHAR" property="packageId" />
+    <result column="NODE_ID" jdbcType="VARCHAR" property="nodeId" />
+    <result column="TO_NODE_ID" jdbcType="VARCHAR" property="toNodeId" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="FROM_NODE_ID" jdbcType="VARCHAR" property="fromNodeId" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from DATA_NODE_PROCESS
+    where PROCESS_ID = #{processId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.server.model.DataNodeProcessBean">
+    insert into DATA_NODE_PROCESS (PROCESS_ID, PACKAGE_ID, NODE_ID, 
+      TO_NODE_ID, CREATE_TIME, FROM_NODE_ID
+      )
+    values (#{processId,jdbcType=VARCHAR}, #{packageId,jdbcType=VARCHAR}, #{nodeId,jdbcType=VARCHAR}, 
+      #{toNodeId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{fromNodeId,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.server.model.DataNodeProcessBean">
+    update DATA_NODE_PROCESS
+    set PACKAGE_ID = #{packageId,jdbcType=VARCHAR},
+      NODE_ID = #{nodeId,jdbcType=VARCHAR},
+      TO_NODE_ID = #{toNodeId,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      FROM_NODE_ID = #{fromNodeId,jdbcType=VARCHAR}
+    where PROCESS_ID = #{processId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select PROCESS_ID, PACKAGE_ID, NODE_ID, TO_NODE_ID, CREATE_TIME, FROM_NODE_ID
+    from DATA_NODE_PROCESS
+    where PROCESS_ID = #{processId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select PROCESS_ID, PACKAGE_ID, NODE_ID, TO_NODE_ID, CREATE_TIME, FROM_NODE_ID
+    from DATA_NODE_PROCESS
+  </select>
+  <select id="selectByUnique" resultMap="BaseResultMap"  parameterType="map">
+    select PROCESS_ID, PACKAGE_ID, NODE_ID, TO_NODE_ID, CREATE_TIME, FROM_NODE_ID
+    from DATA_NODE_PROCESS
+    WHERE PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+      and NODE_ID = #{nodeId,jdbcType=VARCHAR}
+      and TO_NODE_ID = #{toNodeId,jdbcType=VARCHAR}
+  </select>
+</mapper>

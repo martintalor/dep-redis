@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.server.mapper.PackageCurrentStateBeanMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.server.model.PackageCurrentStateBean">
+    <id column="PACKAGE_ID" jdbcType="VARCHAR" property="packageId" />
+    <id column="NODE_ID" jdbcType="VARCHAR" property="nodeId" />
+    <id column="TO_NODE_ID" jdbcType="VARCHAR" property="toNodeId" />
+    <result column="PROCESS_ID" jdbcType="VARCHAR" property="processId" />
+    <result column="SEND_STATE_DM" jdbcType="VARCHAR" property="sendStateDm" />
+    <result column="OPERATE_STATE_DM" jdbcType="VARCHAR" property="operateStateDm" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="map">
+    delete from PACKAGE_CURRENT_STATE
+    where PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+      and NODE_ID = #{nodeId,jdbcType=VARCHAR}
+      and TO_NODE_ID = #{toNodeId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.server.model.PackageCurrentStateBean">
+    insert into PACKAGE_CURRENT_STATE (PACKAGE_ID, NODE_ID, TO_NODE_ID, 
+      PROCESS_ID, SEND_STATE_DM, OPERATE_STATE_DM, 
+      CREATE_TIME, UPDATE_TIME)
+    values (#{packageId,jdbcType=VARCHAR}, #{nodeId,jdbcType=VARCHAR}, #{toNodeId,jdbcType=VARCHAR}, 
+      #{processId,jdbcType=VARCHAR}, #{sendStateDm,jdbcType=VARCHAR}, #{operateStateDm,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.server.model.PackageCurrentStateBean">
+    update PACKAGE_CURRENT_STATE
+    set PROCESS_ID = #{processId,jdbcType=VARCHAR},
+      SEND_STATE_DM = #{sendStateDm,jdbcType=VARCHAR},
+      OPERATE_STATE_DM = #{operateStateDm,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+    where PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+      and NODE_ID = #{nodeId,jdbcType=VARCHAR}
+      and TO_NODE_ID = #{toNodeId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="map" resultMap="BaseResultMap">
+    select PACKAGE_ID, NODE_ID, TO_NODE_ID, PROCESS_ID, SEND_STATE_DM, OPERATE_STATE_DM, 
+    CREATE_TIME, UPDATE_TIME
+    from PACKAGE_CURRENT_STATE
+    where PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+      and NODE_ID = #{nodeId,jdbcType=VARCHAR}
+      and TO_NODE_ID = #{toNodeId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select PACKAGE_ID, NODE_ID, TO_NODE_ID, PROCESS_ID, SEND_STATE_DM, OPERATE_STATE_DM, 
+    CREATE_TIME, UPDATE_TIME
+    from PACKAGE_CURRENT_STATE
+  </select>
+</mapper>

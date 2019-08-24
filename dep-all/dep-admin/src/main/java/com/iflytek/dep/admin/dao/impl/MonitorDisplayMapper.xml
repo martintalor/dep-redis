@@ -1,0 +1,906 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iflytek.dep.admin.dao.MonitorDisplayMapper">
+
+    <select id="getPackStatResult" resultType="java.util.Map">
+    select 'SEND_FAIL_TODAY' AS STAT_TYPE, COUNT(ps.package_id) as STAT_COUNT, (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0)) as STAT_SUM
+    from  LOGICAL_SERVER_NODE n
+    inner join machine_node m on m.server_node_id=n.server_node_id  and m.NODE_TYPE_DM='01'
+    inner join package_current_state ps on ps.node_id=m.node_id and ps.send_state_dm='00'
+    left join data_package p on p.package_id=ps.package_id
+    left join data_package_sub su on su.sub_package_id=ps.package_id
+    where n.SERVER_NODE_ID=#{serverNodeId} AND TO_CHAR(ps.update_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+
+    UNION ALL
+    select 'SEND_FAIL_LAST_WEEK' AS STAT_TYPE, COUNT(ps.package_id) as STAT_COUNT, (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0)) as STAT_SUM
+    from  LOGICAL_SERVER_NODE n
+    inner join machine_node m on m.server_node_id=n.server_node_id  and m.NODE_TYPE_DM='01'
+    inner join package_current_state ps on ps.node_id=m.node_id and ps.send_state_dm='00'
+    left join data_package p on p.package_id=ps.package_id
+    left join data_package_sub su on su.sub_package_id=ps.package_id
+    where n.SERVER_NODE_ID=#{serverNodeId} AND TO_CHAR(ps.update_time,'yyyy-MM-dd')=TO_CHAR(sysdate-7,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+
+    UNION ALL
+    select 'SEND_FAIL_YESTERDAY' AS STAT_TYPE, COUNT(ps.package_id) as STAT_COUNT, (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0)) as STAT_SUM
+    from  LOGICAL_SERVER_NODE n
+    inner join machine_node m on m.server_node_id=n.server_node_id  and m.NODE_TYPE_DM='01'
+    inner join package_current_state ps on ps.node_id=m.node_id and ps.send_state_dm='00'
+    left join data_package p on p.package_id=ps.package_id
+    left join data_package_sub su on su.sub_package_id=ps.package_id
+    where n.SERVER_NODE_ID=#{serverNodeId} AND TO_CHAR(ps.update_time,'yyyy-MM-dd')=TO_CHAR(sysdate-1,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+
+    UNION ALL
+    select 'RECV_TODAY' AS STAT_TYPE, COUNT(ps.package_id) as STAT_NUM, (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0)) as STAT_SUM
+    from  LOGICAL_SERVER_NODE n
+    inner join machine_node m on m.server_node_id=n.server_node_id  and m.NODE_TYPE_DM='01'
+    inner join data_node_process ps on ps.node_id=m.node_id
+    inner join node_send_state s on s.process_id=ps.process_id and s.send_state_dm='20'
+    left join data_package p on p.package_id=ps.package_id
+    left join data_package_sub su on su.sub_package_id=ps.package_id
+    where n.SERVER_NODE_ID=#{serverNodeId} AND TO_CHAR(s.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+
+    UNION ALL
+    SELECT 'SUCC_TODAY' AS STAT_TYPE, COUNT(ps.package_id) as STAT_COUNT, (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0)) as STAT_SUM
+    from  LOGICAL_SERVER_NODE n
+    inner join machine_node m on m.server_node_id=n.server_node_id  and m.NODE_TYPE_DM='01'
+    inner join data_node_process ps on ps.node_id=m.node_id
+    inner join node_send_state s on s.process_id=ps.process_id and s.send_state_dm='30'
+    left join data_package p on p.package_id=ps.package_id
+    left join data_package_sub su on su.sub_package_id=ps.package_id
+    where n.SERVER_NODE_ID=#{serverNodeId} AND TO_CHAR(s.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+
+    UNION ALL
+    SELECT 'SUCC_LAST_WEEK' AS STAT_TYPE, COUNT(ps.package_id) as STAT_COUNT, (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0)) as STAT_SUM
+    from  LOGICAL_SERVER_NODE n
+    inner join machine_node m on m.server_node_id=n.server_node_id  and m.NODE_TYPE_DM='01'
+    inner join data_node_process ps on ps.node_id=m.node_id
+    inner join node_send_state s on s.process_id=ps.process_id and s.send_state_dm='30'
+    left join data_package p on p.package_id=ps.package_id
+    left join data_package_sub su on su.sub_package_id=ps.package_id
+    where n.SERVER_NODE_ID=#{serverNodeId} AND TO_CHAR(s.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate-7,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+
+    UNION ALL
+    SELECT 'SUCC_YESTERDAY' AS STAT_TYPE, COUNT(ps.package_id) as STAT_COUNT, (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0)) as STAT_SUM
+    from  LOGICAL_SERVER_NODE n
+    inner join machine_node m on m.server_node_id=n.server_node_id  and m.NODE_TYPE_DM='01'
+    inner join data_node_process ps on ps.node_id=m.node_id
+    inner join node_send_state s on s.process_id=ps.process_id and s.send_state_dm='30'
+    left join data_package p on p.package_id=ps.package_id
+    left join data_package_sub su on su.sub_package_id=ps.package_id
+    where n.SERVER_NODE_ID=#{serverNodeId} AND TO_CHAR(s.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate-1,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+  </select>
+
+    <select id="getTransTimeResult" resultType="java.util.Map">
+    SELECT 'TRANS_5MIN' AS STAT_TYPE, COUNT(process_id) as STAT_COUNT
+    FROM (
+        SELECT ps.process_id
+        from  LOGICAL_SERVER_NODE n
+        inner join machine_node m on m.server_node_id=n.server_node_id  and m.NODE_TYPE_DM='01'
+        inner join data_node_process ps on ps.node_id=m.node_id
+        inner join node_send_state s1 on s1.process_id=ps.process_id and s1.send_state_dm='31' AND TO_CHAR(s1.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+        inner join node_link lk on lk.left_node_id=ps.node_id and lk.package_id=ps.package_id and lk.to_node_id=ps.to_node_id
+        inner join data_node_process ps2 on ps2.node_id=lk.right_node_id and ps2.package_id=ps.package_id and ps2.to_node_id=ps.to_node_id
+        inner join node_send_state s2 on s2.process_id=ps2.process_id and s2.send_state_dm='20'
+        left join data_package p on p.package_id=ps.package_id
+        left join data_package_sub su on su.sub_package_id=ps.package_id
+        where n.SERVER_NODE_ID=#{serverNodeId}
+        and ROUND(TO_NUMBER(s2.create_time-s1.create_time) * 24 * 60)&lt;5
+        AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+      UNION ALL
+        SELECT ps.process_id
+        from  LOGICAL_SERVER_NODE n
+        inner join machine_node m on m.server_node_id=n.server_node_id  and m.NODE_TYPE_DM='01'
+        inner join data_node_process ps on ps.node_id=m.node_id
+        inner join node_send_state s1 on s1.process_id=ps.process_id and s1.send_state_dm='20' AND TO_CHAR(s1.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+        inner join node_link lk on lk.right_node_id=ps.node_id and lk.package_id=ps.package_id and lk.to_node_id=ps.to_node_id
+        inner join data_node_process ps2 on ps2.node_id=lk.left_node_id and ps2.package_id=ps.package_id and ps2.to_node_id=ps.to_node_id
+        inner join node_send_state s2 on s2.process_id=ps.process_id and s2.send_state_dm='31'
+        left join data_package p on p.package_id=ps.package_id
+        left join data_package_sub su on su.sub_package_id=ps.package_id
+        where n.SERVER_NODE_ID=#{serverNodeId}
+        and ROUND(TO_NUMBER(s1.create_time-s2.create_time) * 24 * 60)&lt;5
+        AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+    )
+
+    UNION ALL
+    SELECT 'TRANS_10MIN' AS STAT_TYPE, COUNT(process_id) as STAT_COUNT
+    FROM (
+        SELECT ps.process_id
+        from  LOGICAL_SERVER_NODE n
+        inner join machine_node m on m.server_node_id=n.server_node_id  and m.NODE_TYPE_DM='01'
+        inner join data_node_process ps on ps.node_id=m.node_id
+        inner join node_send_state s1 on s1.process_id=ps.process_id and s1.send_state_dm='31' AND TO_CHAR(s1.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+        inner join node_link lk on lk.left_node_id=ps.node_id and lk.package_id=ps.package_id and lk.to_node_id=ps.to_node_id
+        inner join data_node_process ps2 on ps2.node_id=lk.right_node_id and ps2.package_id=ps.package_id and ps2.to_node_id=ps.to_node_id
+        inner join node_send_state s2 on s2.process_id=ps2.process_id and s2.send_state_dm='20'
+        left join data_package p on p.package_id=ps.package_id
+        left join data_package_sub su on su.sub_package_id=ps.package_id
+        where n.SERVER_NODE_ID=#{serverNodeId}
+         AND ROUND(TO_NUMBER(s2.create_time-s1.create_time) * 24 * 60)>=5
+         AND ROUND(TO_NUMBER(s2.create_time-s1.create_time) * 24 * 60)&lt;10
+         AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+      UNION ALL
+        SELECT ps.process_id
+        from  LOGICAL_SERVER_NODE n
+        inner join machine_node m on m.server_node_id=n.server_node_id  and m.NODE_TYPE_DM='01'
+        inner join data_node_process ps on ps.node_id=m.node_id
+        inner join node_send_state s1 on s1.process_id=ps.process_id and s1.send_state_dm='20' AND TO_CHAR(s1.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+        inner join node_link lk on lk.right_node_id=ps.node_id and lk.package_id=ps.package_id and lk.to_node_id=ps.to_node_id
+        inner join data_node_process ps2 on ps2.node_id=lk.left_node_id and ps2.package_id=ps.package_id and ps2.to_node_id=ps.to_node_id
+        inner join node_send_state s2 on s2.process_id=ps.process_id and s2.send_state_dm='31'
+        left join data_package p on p.package_id=ps.package_id
+        left join data_package_sub su on su.sub_package_id=ps.package_id
+        where n.SERVER_NODE_ID=#{serverNodeId}
+         AND ROUND(TO_NUMBER(s1.create_time-s2.create_time) * 24 * 60)>=5
+         AND ROUND(TO_NUMBER(s1.create_time-s2.create_time) * 24 * 60)&lt;10
+         AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+     )
+
+    UNION ALL
+    SELECT 'TRANS_30MIN' AS STAT_TYPE, COUNT(process_id) as STAT_COUNT
+    FROM (
+        SELECT ps.process_id
+        from  LOGICAL_SERVER_NODE n
+        inner join machine_node m on m.server_node_id=n.server_node_id  and m.NODE_TYPE_DM='01'
+        inner join data_node_process ps on ps.node_id=m.node_id
+        inner join node_send_state s1 on s1.process_id=ps.process_id and s1.send_state_dm='31' AND TO_CHAR(s1.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+        inner join node_link lk on lk.left_node_id=ps.node_id and lk.package_id=ps.package_id and lk.to_node_id=ps.to_node_id
+        inner join data_node_process ps2 on ps2.node_id=lk.right_node_id and ps2.package_id=ps.package_id and ps2.to_node_id=ps.to_node_id
+        inner join node_send_state s2 on s2.process_id=ps2.process_id and s2.send_state_dm='20'
+        left join data_package p on p.package_id=ps.package_id
+        left join data_package_sub su on su.sub_package_id=ps.package_id
+        where n.SERVER_NODE_ID=#{serverNodeId}
+          AND ROUND(TO_NUMBER(s2.create_time-s1.create_time) * 24 * 60)>=10
+          AND ROUND(TO_NUMBER(s2.create_time-s1.create_time) * 24 * 60)&lt;30
+          AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+      UNION ALL
+        SELECT ps.process_id
+        from  LOGICAL_SERVER_NODE n
+        inner join machine_node m on m.server_node_id=n.server_node_id  and m.NODE_TYPE_DM='01'
+        inner join data_node_process ps on ps.node_id=m.node_id
+        inner join node_send_state s1 on s1.process_id=ps.process_id and s1.send_state_dm='20' AND TO_CHAR(s1.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+        inner join node_link lk on lk.right_node_id=ps.node_id and lk.package_id=ps.package_id and lk.to_node_id=ps.to_node_id
+        inner join data_node_process ps2 on ps2.node_id=lk.left_node_id and ps2.package_id=ps.package_id and ps2.to_node_id=ps.to_node_id
+        inner join node_send_state s2 on s2.process_id=ps.process_id and s2.send_state_dm='31'
+        left join data_package p on p.package_id=ps.package_id
+        left join data_package_sub su on su.sub_package_id=ps.package_id
+        where n.SERVER_NODE_ID=#{serverNodeId}
+          AND ROUND(TO_NUMBER(s1.create_time-s2.create_time) * 24 * 60)>=10
+          AND ROUND(TO_NUMBER(s1.create_time-s2.create_time) * 24 * 60)&lt;30
+          AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+    )
+
+    UNION ALL
+    SELECT 'TRANS_30PLUS' AS STAT_TYPE, COUNT(process_id) as STAT_COUNT
+    FROM (
+        SELECT ps.process_id
+        from  LOGICAL_SERVER_NODE n
+        inner join machine_node m on m.server_node_id=n.server_node_id  and m.NODE_TYPE_DM='01'
+        inner join data_node_process ps on ps.node_id=m.node_id
+        inner join node_send_state s1 on s1.process_id=ps.process_id and s1.send_state_dm='31' AND TO_CHAR(s1.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+        inner join node_link lk on lk.left_node_id=ps.node_id and lk.package_id=ps.package_id and lk.to_node_id=ps.to_node_id
+        inner join data_node_process ps2 on ps2.node_id=lk.right_node_id and ps2.package_id=ps.package_id and ps2.to_node_id=ps.to_node_id
+        inner join node_send_state s2 on s2.process_id=ps2.process_id and s2.send_state_dm='20'
+        left join data_package p on p.package_id=ps.package_id
+        left join data_package_sub su on su.sub_package_id=ps.package_id
+        where n.SERVER_NODE_ID=#{serverNodeId}
+          AND ROUND(TO_NUMBER(s2.create_time-s1.create_time) * 24 * 60)>=30
+          AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+     UNION ALL
+        SELECT ps.process_id
+        from  LOGICAL_SERVER_NODE n
+        inner join machine_node m on m.server_node_id=n.server_node_id  and m.NODE_TYPE_DM='01'
+        inner join data_node_process ps on ps.node_id=m.node_id
+        inner join node_send_state s1 on s1.process_id=ps.process_id and s1.send_state_dm='20' AND TO_CHAR(s1.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+        inner join node_link lk on lk.right_node_id=ps.node_id and lk.package_id=ps.package_id and lk.to_node_id=ps.to_node_id
+        inner join data_node_process ps2 on ps2.node_id=lk.left_node_id and ps2.package_id=ps.package_id and ps2.to_node_id=ps.to_node_id
+        inner join node_send_state s2 on s2.process_id=ps.process_id and s2.send_state_dm='31'
+        left join data_package p on p.package_id=ps.package_id
+        left join data_package_sub su on su.sub_package_id=ps.package_id
+        where n.SERVER_NODE_ID=#{serverNodeId}
+          AND ROUND(TO_NUMBER(s2.create_time-s1.create_time) * 24 * 60)>=30
+          AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+    )
+  </select>
+
+    <select id="getFrontEndHealthList" parameterType="java.lang.String"
+            resultType="com.iflytek.dep.admin.model.vo.monitor.MonitorDisplayFrontHealthVo">
+    SELECT m.NODE_ID as nodeId, m.MACHINE_IP as machineIp, m.SERVER_NODE_ID as serverNodeId, m.NODE_REMARK as nodeRemark, m.NODE_TYPE_DM as nodeTypeDm ,
+    r.probe_result as probeResult
+    FROM MACHINE_NODE m
+    inner join LOGICAL_SERVER_NODE l on l.SERVER_NODE_ID=m.SERVER_NODE_ID
+    left join FTP_MONITOR r on r.node_id=m.node_id
+    WHERE l.SERVER_NODE_ID=#{serverNodeId} and m.node_type_dm='02' /*FTP服务器*/
+  </select>
+
+    <select id="getFrontEndHealthStatByNodeId" parameterType="java.lang.String"
+            resultType="com.iflytek.dep.admin.model.vo.monitor.MonitorDisplayFrontHealthVo">
+    SELECT
+    (select COUNT(ps.package_id)
+        from package_current_state ps
+        left join data_package p on p.package_id=ps.package_id
+        left join data_package_sub su on su.sub_package_id=ps.package_id
+        where ps.node_id=m.node_id and ps.send_state_dm='00'
+        AND TO_CHAR(ps.update_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+        AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        ) as sendNumFail,
+    (select COUNT(ps.package_id)
+        from node_send_state ns
+        inner join data_node_process ps on ps.process_id=ns.process_id
+        left join data_package p on p.package_id=ps.package_id
+        left join data_package_sub su on su.sub_package_id=ps.package_id
+        where ps.node_id=m.node_id and ns.send_state_dm='30'
+        AND TO_CHAR(ns.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+        AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        ) as sendNumSucc,
+    (select (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0))
+        from  node_send_state ns
+        inner join data_node_process ps on ps.process_id=ns.process_id
+        left join data_package p on p.package_id=ps.package_id
+        left join data_package_sub su on su.sub_package_id=ps.package_id
+        where ps.node_id=m.node_id and ns.send_state_dm='31'
+        AND TO_CHAR(ns.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+        AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        ) as sendSizeSending,
+    (select (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0))
+        from  node_send_state ns
+        inner join data_node_process ps on ps.process_id=ns.process_id
+        left join data_package p on p.package_id=ps.package_id
+        left join data_package_sub su on su.sub_package_id=ps.package_id
+        where ps.node_id=m.node_id and ns.send_state_dm='30'
+        AND TO_CHAR(ns.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+        AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        ) as sendSizeSendSucc,
+    (select (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0))
+        from package_current_state ps
+        left join data_package p on p.package_id=ps.package_id
+        left join data_package_sub su on su.sub_package_id=ps.package_id
+        where ps.node_id=m.node_id and ps.send_state_dm='00'
+        AND TO_CHAR(ps.update_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+        AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        ) as sendSizeSendFail,
+    (select (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0))
+        from  node_send_state ns
+        inner join data_node_process ps on ps.process_id=ns.process_id
+        left join data_package p on p.package_id=ps.package_id
+        left join data_package_sub su on su.sub_package_id=ps.package_id
+        where ps.node_id=m.node_id  and ns.send_state_dm='21'
+        AND TO_CHAR(ns.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+        AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        ) as recvSizeRecving,
+    (select (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0))
+        from  node_send_state ns
+        inner join data_node_process ps on ps.process_id=ns.process_id
+        left join data_package p on p.package_id=ps.package_id
+        left join data_package_sub su on su.sub_package_id=ps.package_id
+        where ps.node_id=m.node_id and ns.send_state_dm='20'
+        AND TO_CHAR(ns.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+        AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        ) as recvSizeRecvSucc
+        FROM MACHINE_NODE m
+        where m.node_id=#{nodeId}
+    </select>
+
+    <select id="getTrendStatData"
+            resultType="com.iflytek.dep.admin.model.vo.monitor.MonitorDisplayTrendVo">
+        SELECT A.date1 as trendDate, NVL(B.trendCounter,0) as trendCounter,NVL(B.trendSize,0) as trendSize
+        FROM (
+        select
+        <if test="trendDateType=='today'">(TO_CHAR(trunc(sysdate), 'yyyy-MM-dd')||' '||substr('0'||(level - 1), length('0'||(level - 1))-1, length('0'||(level - 1)))) date1 FROM DUAL
+            connect by LEVEL &lt;= 24
+        </if>
+        <if test="trendDateType=='week'">TO_CHAR(trunc(sysdate,'iw')+ LEVEL - 1, 'yyyy-MM-dd') date1 FROM DUAL connect
+            BY LEVEL &lt;= 7
+        </if>
+        <if test="trendDateType=='month'">TO_CHAR(TRUNC(SYSDATE,'MM')+ROWNUM-1, 'yyyy-MM-dd') date1 FROM DUAL connect by
+            ROWNUM&lt;=to_char(last_day(SYSDATE),'dd')
+        </if>
+        <if test="trendDateType=='year'">TO_CHAR(sysdate,'yyyy-')||lpad(LEVEL,2,0) date1 FROM DUAL connect by LEVEL&lt;13</if>
+        <if test="startTime != null and endTime != null and days &lt;= 1">
+            TO_CHAR(trunc(TO_DATE(#{startTime}, 'yyyy-MM-dd')) + (rownum - 1) / 24, 'yyyy-MM-dd hh24') date1 FROM DUAL
+            connect by LEVEL &lt;= 24
+        </if>
+        <if test="startTime != null and endTime != null and days>1 and days &lt;= 31">
+            TO_CHAR(TO_DATE(#{startTime}, 'yyyy-MM-dd') + ROWNUM - 1, 'yyyy-MM-dd') as date1
+            FROM DUAL
+            CONNECT BY ROWNUM &lt;=trunc(to_date(#{endTime}, 'yyyy-MM-dd') - to_date(#{startTime}, 'yyyy-MM-dd')) +1
+        </if>
+        <if test="startTime != null and endTime != null and days > 31">
+            TO_CHAR(ADD_MONTHS(TO_DATE(#{startTime}, 'yyyy-MM-dd'), ROWNUM-1), 'YYYY-MM') date1
+            FROM DUAL
+            CONNECT BY ROWNUM &lt;= MONTHS_BETWEEN(TO_DATE(#{endTime}, 'yyyy-MM-dd'), TO_DATE(#{startTime},
+            'yyyy-MM-dd')) + 1
+        </if>
+        ) A
+        LEFT JOIN
+        (SELECT
+        COUNT(TEMP.package_id) as trendCounter,sum(TEMP.package_size) AS trendSize,
+        <if test="trendDateType=='today'">TO_CHAR (TEMP.create_time, 'yyyy-MM-dd hh24') as trendDate</if>
+        <if test="trendDateType=='week'">TO_CHAR (TEMP.create_time, 'yyyy-MM-dd') as trendDate</if>
+        <if test="trendDateType=='month'">TO_CHAR (TEMP.create_time, 'yyyy-MM-dd') as trendDate</if>
+        <if test="trendDateType=='year'">TO_CHAR (TEMP.create_time, 'yyyy-MM') as trendDate</if>
+        <if test="startTime != null and endTime != null and days &lt;= 1">TO_CHAR (TEMP.create_time, 'yyyy-MM-dd hh24')
+            as trendDate
+        </if>
+        <if test="startTime != null and endTime != null and days>1 and days &lt;= 31">TO_CHAR (TEMP.create_time,
+            'yyyy-MM-dd') as trendDate
+        </if>
+        <if test="startTime != null and endTime != null and days > 31">TO_CHAR (TEMP.create_time, 'yyyy-MM') as
+            trendDate
+        </if>
+        FROM
+        (
+        select ps.package_id, s.create_time, nvl(P.package_size,0)+nvl(su.package_size,0) as package_size
+        from node_send_state s
+        inner join data_node_process ps on ps.process_id=s.process_id
+        inner join machine_node m on m.node_id=ps.node_id and m.NODE_TYPE_DM='01'
+        inner join LOGICAL_SERVER_NODE l on l.server_node_id=m.server_node_id
+        left join data_package p on p.package_id=ps.package_id
+        left join data_package_sub su on su.sub_package_id=ps.package_id
+        <where>
+            l.SERVER_NODE_ID=#{serverNodeId}
+            <if test="sendOrRecv=='send' and succOrFail=='succ'">and s.send_state_dm='30'</if>
+            <if test="sendOrRecv=='recv' and succOrFail=='succ'">and s.send_state_dm='20'</if>
+            <if test="trendDateType=='today'">AND TO_CHAR(s.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')</if>
+            <if test="trendDateType=='week'">AND TRUNC(s.create_time)>TRUNC(sysdate-(to_char(sysdate-1,'D')))</if>
+            <if test="trendDateType=='month'">AND TO_CHAR(s.create_time,'yyyy-MM')=TO_CHAR(sysdate,'yyyy-MM')</if>
+            <if test="trendDateType=='year'">AND TO_CHAR(s.create_time,'yyyy')=TO_CHAR(sysdate,'yyyy')</if>
+            <if test="startTime != null and endTime != null">
+                AND to_char(s.create_time,'yyyy-MM-dd')>=#{startTime}
+                AND to_char(s.create_time,'yyyy-MM-dd')&lt;=#{endTime}
+            </if>
+            AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        </where>
+        ) TEMP
+        <if test="trendDateType=='today'">
+            GROUP BY TO_CHAR (TEMP.create_time, 'yyyy-MM-dd hh24')
+        </if>
+        <if test="trendDateType=='week'">
+            GROUP BY TO_CHAR (TEMP.create_time, 'yyyy-MM-dd')
+        </if>
+        <if test="trendDateType=='month'">
+            GROUP BY TO_CHAR (TEMP.create_time, 'yyyy-MM-dd')
+        </if>
+        <if test="trendDateType=='year'">
+            GROUP BY TO_CHAR (TEMP.create_time, 'yyyy-MM')
+        </if>
+        <if test="startTime != null and endTime != null and days &lt;= 1">
+            GROUP BY TO_CHAR (TEMP.create_time, 'yyyy-MM-dd hh24')
+        </if>
+        <if test="startTime != null and endTime != null and days>1 and days &lt;= 31">
+            GROUP BY TO_CHAR (TEMP.create_time, 'yyyy-MM-dd')
+        </if>
+        <if test="startTime != null and endTime != null and days > 31">
+            GROUP BY TO_CHAR (TEMP.create_time, 'yyyy-MM')
+        </if>
+        )B ON B.trendDate=A.date1
+        ORDER BY trendDate
+    </select>
+
+    <select id="getTrendStatDataForSendFail"
+            resultType="com.iflytek.dep.admin.model.vo.monitor.MonitorDisplayTrendVo">
+        SELECT A.date1 as trendDate, NVL(B.trendCounter,0) as trendCounter ,NVL(B.trendSize,0) as trendSize
+        FROM (
+        select
+        <if test="trendDateType=='today'">(TO_CHAR(trunc(sysdate), 'yyyy-MM-dd')||' '||substr('0'||(level - 1), length('0'||(level - 1))-1, length('0'||(level - 1)))) date1 FROM DUAL
+            connect by LEVEL &lt;= 24
+        </if>
+        <if test="trendDateType=='week'">TO_CHAR(trunc(sysdate,'iw')+ LEVEL - 1, 'yyyy-MM-dd') date1 FROM DUAL connect
+            BY LEVEL &lt;= 7
+        </if>
+        <if test="trendDateType=='month'">TO_CHAR(TRUNC(SYSDATE,'MM')+ROWNUM-1, 'yyyy-MM-dd') date1 FROM DUAL connect by
+            ROWNUM&lt;=to_char(last_day(SYSDATE),'dd')
+        </if>
+        <if test="trendDateType=='year'">TO_CHAR(sysdate,'yyyy-')||lpad(LEVEL,2,0) date1 FROM DUAL connect by LEVEL&lt;13</if>
+        <if test="startTime != null and endTime != null and days &lt;= 1">
+            TO_CHAR(trunc(TO_DATE(#{startTime}, 'yyyy-MM-dd')) + (rownum - 1) / 24, 'yyyy-MM-dd hh24') date1 FROM DUAL
+            connect by LEVEL &lt;= 24
+        </if>
+        <if test="startTime != null and endTime != null and days>1 and days &lt;= 31">
+            TO_CHAR(TO_DATE(#{startTime}, 'yyyy-MM-dd') + ROWNUM - 1, 'yyyy-MM-dd') as date1
+            FROM DUAL
+            CONNECT BY ROWNUM &lt;=trunc(to_date(#{endTime}, 'yyyy-MM-dd') - to_date(#{startTime}, 'yyyy-MM-dd')) +1
+        </if>
+        <if test="startTime != null and endTime != null and days > 31">
+            TO_CHAR(ADD_MONTHS(TO_DATE(#{startTime}, 'yyyy-MM-dd'), ROWNUM-1), 'YYYY-MM') date1
+            FROM DUAL
+            CONNECT BY ROWNUM &lt;= MONTHS_BETWEEN(TO_DATE(#{endTime}, 'yyyy-MM-dd'), TO_DATE(#{startTime},
+            'yyyy-MM-dd')) + 1
+        </if>
+        ) A
+        LEFT JOIN
+        (SELECT
+        COUNT(TEMP.package_id) as trendCounter,sum(TEMP.package_size) AS trendSize,
+        <if test="trendDateType=='today'">TO_CHAR (TEMP.update_time, 'yyyy-MM-dd hh24') as trendDate</if>
+        <if test="trendDateType=='week'">TO_CHAR (TEMP.update_time, 'yyyy-MM-dd') as trendDate</if>
+        <if test="trendDateType=='month'">TO_CHAR (TEMP.update_time, 'yyyy-MM-dd') as trendDate</if>
+        <if test="trendDateType=='year'">TO_CHAR (TEMP.update_time, 'yyyy-MM') as trendDate</if>
+        <if test="startTime != null and endTime != null and days &lt;= 1">TO_CHAR (TEMP.update_time, 'yyyy-MM-dd hh24')
+            as trendDate
+        </if>
+        <if test="startTime != null and endTime != null and days>1 and days &lt;= 31">TO_CHAR (TEMP.update_time,
+            'yyyy-MM-dd') as trendDate
+        </if>
+        <if test="startTime != null and endTime != null and days > 31">TO_CHAR (TEMP.update_time, 'yyyy-MM') as
+            trendDate
+        </if>
+        FROM
+        (
+        select ps.package_id, ps.update_time,nvl(P.package_size,0)+nvl(su.package_size,0) as package_size
+        from package_current_state ps
+        inner join machine_node m on m.node_id=ps.node_id and m.NODE_TYPE_DM='01'
+        inner join LOGICAL_SERVER_NODE l on l.server_node_id=m.server_node_id
+        left join data_package p on p.package_id=ps.package_id
+        left join data_package_sub su on su.sub_package_id=ps.package_id
+        <where>
+            l.SERVER_NODE_ID=#{serverNodeId}
+            and ps.send_state_dm='00'
+            <if test="trendDateType=='today'">AND TO_CHAR(ps.update_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+            </if>
+            <if test="trendDateType=='week'">AND TRUNC(ps.update_time)>TRUNC(sysdate-(to_char(sysdate-1,'D')))</if>
+            <if test="trendDateType=='month'">AND TO_CHAR(ps.update_time,'yyyy-MM')=TO_CHAR(sysdate,'yyyy-MM')</if>
+            <if test="trendDateType=='year'">AND TO_CHAR(ps.update_time,'yyyy')=TO_CHAR(sysdate,'yyyy')</if>
+            <if test="startTime != null and endTime != null">
+                AND to_char(ps.update_time,'yyyy-MM-dd')>=#{startTime}
+                AND to_char(ps.update_time,'yyyy-MM-dd')&lt;=#{endTime}
+            </if>
+            AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        </where>
+        ) TEMP
+        <if test="trendDateType=='today'">
+            GROUP BY TO_CHAR (TEMP.update_time, 'yyyy-MM-dd hh24')
+        </if>
+        <if test="trendDateType=='week'">
+            GROUP BY TO_CHAR (TEMP.update_time, 'yyyy-MM-dd')
+        </if>
+        <if test="trendDateType=='month'">
+            GROUP BY TO_CHAR (TEMP.update_time, 'yyyy-MM-dd')
+        </if>
+        <if test="trendDateType=='year'">
+            GROUP BY TO_CHAR (TEMP.update_time, 'yyyy-MM')
+        </if>
+        <if test="startTime != null and endTime != null and days &lt;= 1">
+            GROUP BY TO_CHAR (TEMP.update_time, 'yyyy-MM-dd hh24')
+        </if>
+        <if test="startTime != null and endTime != null and days>1 and days &lt;= 31">
+            GROUP BY TO_CHAR (TEMP.update_time, 'yyyy-MM-dd')
+        </if>
+        <if test="startTime != null and endTime != null and days > 31">
+            GROUP BY TO_CHAR (TEMP.update_time, 'yyyy-MM')
+        </if>
+        )B ON B.trendDate=A.date1
+        ORDER BY trendDate
+    </select>
+
+    <select id="getTransFlowList"
+            resultType="com.iflytek.dep.admin.model.vo.monitor.MonitorDisplayTrendVo">
+        SELECT A.date1 as trendDate, NVL(B.trendCounter,0) as trendCounter
+        FROM (
+            select (TO_CHAR(trunc(sysdate), 'yyyy-MM-dd')||' '||substr('0'||(level - 1), length('0'||(level - 1))-1, length('0'||(level - 1)))) date1 FROM DUAL
+            connect by LEVEL &lt;= 24
+        ) A
+        LEFT JOIN
+        (SELECT
+            SUM(TEMP.packageSize) as trendCounter,
+            TO_CHAR (TEMP.create_time, 'yyyy-MM-dd hh24') as trendDate
+            FROM
+            (
+
+              select ps.package_id, s.create_time, (NVL(p.package_size,0)+NVL(su.package_size,0)) as packageSize
+                from node_send_state s
+                inner join data_node_process ps on ps.process_id=s.process_id
+                inner join machine_node m on m.node_id=ps.node_id and m.NODE_TYPE_DM='01'
+                inner join LOGICAL_SERVER_NODE l on l.server_node_id=m.server_node_id
+                left join data_package p on p.package_id=ps.package_id
+                left join data_package_sub su on su.sub_package_id=ps.package_id
+                where l.SERVER_NODE_ID=#{serverNodeId} AND s.send_state_dm='30' /*发送成功的*/
+                       AND TO_CHAR(s.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+                       AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+
+              UNION ALL
+              select ps.package_id, s.create_time, (NVL(p.package_size,0)+NVL(su.package_size,0)) as packageSize
+                from node_send_state s
+                inner join data_node_process ps on ps.process_id=s.process_id
+                inner join machine_node m on m.node_id=ps.node_id and m.NODE_TYPE_DM='01'
+                inner join LOGICAL_SERVER_NODE l on l.server_node_id=m.server_node_id
+                left join data_package p on p.package_id=ps.package_id
+                left join data_package_sub su on su.sub_package_id=ps.package_id
+                where l.SERVER_NODE_ID=#{serverNodeId} AND s.send_state_dm='20' /*接收成功的*/
+                       AND TO_CHAR(s.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+                       AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+
+              UNION ALL
+              select s.package_id, s.update_time as create_time, NVL(p.package_size+su.package_size,0) as packageSize
+                from package_current_state s
+                inner join machine_node m on m.node_id=s.node_id and m.NODE_TYPE_DM='01'
+                inner join LOGICAL_SERVER_NODE l on l.server_node_id=m.server_node_id
+                left join data_package p on p.package_id=s.package_id
+                left join data_package_sub su on su.sub_package_id=s.package_id
+                where l.SERVER_NODE_ID=#{serverNodeId} AND s.send_state_dm='00' /*发送失败的*/
+                       AND TO_CHAR(s.update_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+                       AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+
+            ) TEMP GROUP BY TO_CHAR (TEMP.create_time, 'yyyy-MM-dd hh24')
+        )B ON B.trendDate=A.date1
+        ORDER BY trendDate
+    </select>
+
+    <select id="getDepServerProbeResult"
+            resultType="com.iflytek.dep.admin.model.vo.monitor.MonitorDisplayProbeResultVo">
+        select r.probe_result as probeResult, COUNT(r.dep_server_id) as resultCnt
+        FROM LOGICAL_SERVER_NODE l
+        INNER JOIN DEP_SERVER d on l.SERVER_NODE_ID=d.server_node_id
+        inner join SERVER_MONITOR r on d.DEP_SERVER_ID=r.DEP_SERVER_ID
+        WHERE l.SERVER_NODE_ID=#{serverNodeId}
+        GROUP BY r.probe_result
+    </select>
+    <select id="getFtpServerProbeResult"
+            resultType="com.iflytek.dep.admin.model.vo.monitor.MonitorDisplayProbeResultVo">
+        select r.probe_result as probeResult, COUNT(r.ftp_id) as resultCnt
+        FROM LOGICAL_SERVER_NODE l
+        INNER JOIN MACHINE_NODE m ON l.SERVER_NODE_ID=m.SERVER_NODE_ID
+        INNER JOIN FTP_MONITOR r on r.NODE_ID=m.NODE_ID
+        WHERE l.SERVER_NODE_ID=#{serverNodeId}
+        GROUP BY r.probe_result
+    </select>
+
+    <!--查询中心平台数据包传输统计-->
+    <select id="getPackStatResultForAllBranch" resultType="java.util.Map">
+        /*先统计中心逻辑节点的数据包传输统计*/
+        SELECT 'SEND' as RECVORSEND, l.org_type_dm as ORGTYPE, s.send_state_dm as SENDSTATE,
+        (COUNT(p.package_id)+COUNT(su.sub_package_id)) as PACKAGECNT,
+        (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0)) as PACKAGESIZE
+        FROM
+        LOGICAL_SERVER_NODE l
+        INNER JOIN MACHINE_NODE m ON m.server_node_id=l.server_node_id and m.NODE_TYPE_DM='01'
+        INNER JOIN data_node_process ps on ps.node_id=m.node_id
+        INNER JOIN node_send_state s on s.process_id=ps.process_id
+        LEFT JOIN data_package p on p.package_id=ps.package_id
+        LEFT JOIN data_package_sub su on su.sub_package_id=ps.package_id
+        WHERE l.server_node_id=#{serverNodeId}
+        AND s.send_state_dm='30' AND TO_CHAR(s.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        GROUP BY l.org_type_dm, s.send_state_dm
+
+        UNION ALL
+        SELECT 'SEND' as RECVORSEND, l.org_type_dm as ORGTYPE, s.send_state_dm as SENDSTATE,
+        (COUNT(p.package_id)+COUNT(su.sub_package_id)) as PACKAGECNT,
+        (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0)) as PACKAGESIZE
+        FROM
+        LOGICAL_SERVER_NODE l
+        INNER JOIN MACHINE_NODE m ON m.server_node_id=l.server_node_id and m.NODE_TYPE_DM='01'
+        INNER JOIN package_current_state s on s.node_id=m.node_id
+        LEFT JOIN data_package p on p.package_id=s.package_id
+        LEFT JOIN data_package_sub su on su.sub_package_id=s.package_id
+        WHERE l.server_node_id=#{serverNodeId}
+        AND s.send_state_dm='00' AND TO_CHAR(s.update_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        GROUP BY l.org_type_dm, s.send_state_dm
+
+        UNION ALL
+
+        SELECT 'RECV' as RECVORSEND, l.org_type_dm as ORGTYPE, s.send_state_dm as SENDSTATE,
+        (COUNT(p.package_id)+COUNT(su.sub_package_id)) as PACKAGECNT,
+        (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0)) as PACKAGESIZE
+        FROM
+        LOGICAL_SERVER_NODE l
+        INNER JOIN MACHINE_NODE m ON m.server_node_id=l.server_node_id and m.NODE_TYPE_DM='01'
+        INNER JOIN data_node_process ps on ps.node_id=m.node_id
+        INNER JOIN node_send_state s on s.process_id=ps.process_id
+        LEFT JOIN data_package p on p.package_id=ps.package_id
+        LEFT JOIN data_package_sub su on su.sub_package_id=ps.package_id
+        WHERE l.server_node_id=#{serverNodeId}
+        AND s.send_state_dm='20' AND TO_CHAR(s.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        GROUP BY l.org_type_dm, s.send_state_dm
+
+        UNION ALL
+
+        /*再统计分平台逻辑节点的数据包传输统计*/
+        SELECT 'SEND' as RECVORSEND, l.org_type_dm as ORGTYPE, '30' as SENDSTATE,
+        (COUNT(p.package_id)+COUNT(su.sub_package_id)) as PACKAGECNT,
+        (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0)) as PACKAGESIZE
+        FROM
+        LOGICAL_SERVER_NODE l
+        INNER JOIN MACHINE_NODE m ON m.server_node_id=l.server_node_id and m.NODE_TYPE_DM='01'
+        INNER JOIN data_node_process ps on ps.from_node_id=m.node_id
+        INNER JOIN MACHINE_NODE m2 on m2.node_id=ps.node_id and m2.node_type_dm='02'
+        INNER JOIN node_send_state s on s.process_id=ps.process_id
+        LEFT JOIN data_package p on p.package_id=ps.package_id
+        LEFT JOIN data_package_sub su on su.sub_package_id=ps.package_id
+        WHERE l.server_node_id!=#{serverNodeId}
+        AND s.send_state_dm='20' AND TO_CHAR(s.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        GROUP BY l.org_type_dm, s.send_state_dm
+
+        UNION ALL
+
+        SELECT 'RECV' as RECVORSEND, l.org_type_dm as ORGTYPE, '20' as SENDSTATE,
+        (COUNT(p.package_id)+COUNT(su.sub_package_id)) as PACKAGECNT,
+        (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0)) as PACKAGESIZE
+        FROM
+        LOGICAL_SERVER_NODE l
+        INNER JOIN MACHINE_NODE m ON m.server_node_id=l.server_node_id and m.NODE_TYPE_DM='01'
+        INNER JOIN data_node_process ps on ps.to_node_id=m.node_id
+        INNER JOIN MACHINE_NODE m2 on m2.node_id=ps.node_id and m2.node_type_dm='02'
+        INNER JOIN LOGICAL_SERVER_NODE l2 on l2.server_node_id=m2.server_node_id AND l.server_node_id=l2.server_node_id
+        INNER JOIN node_send_state s on s.process_id=ps.process_id
+        LEFT JOIN data_package p on p.package_id=ps.package_id
+        LEFT JOIN data_package_sub su on su.sub_package_id=ps.package_id
+        WHERE l.server_node_id!=#{serverNodeId}
+        AND s.send_state_dm='30' AND TO_CHAR(s.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        GROUP BY l.org_type_dm, s.send_state_dm
+    </select>
+
+    <select id="getRecvTopForCenter" resultType="java.util.Map">
+        /*中心节点接收量*/
+        (SELECT l.org_type_dm as orgType,
+        (COUNT(p.package_id)+COUNT(su.sub_package_id)) as packageCnt
+        FROM
+        LOGICAL_SERVER_NODE l
+        INNER JOIN MACHINE_NODE m ON m.server_node_id=l.server_node_id and m.NODE_TYPE_DM='01'
+        INNER JOIN data_node_process ps on ps.node_id=m.node_id
+        INNER JOIN node_send_state s on s.process_id=ps.process_id and s.send_state_dm='20'
+        LEFT JOIN data_package p on p.package_id=ps.package_id
+        LEFT JOIN data_package_sub su on su.sub_package_id=ps.package_id
+        WHERE
+        <if test="trendDateType=='today'">TO_CHAR(s.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')</if>
+        <if test="trendDateType=='week'">TRUNC(s.create_time)>TRUNC(sysdate-(to_char(sysdate-1,'D')))</if>
+        <if test="trendDateType=='month'">TO_CHAR(s.create_time,'yyyy-MM')=TO_CHAR(sysdate,'yyyy-MM')</if>
+        <if test="trendDateType=='year'">TO_CHAR(s.create_time,'yyyy')=TO_CHAR(sysdate,'yyyy')</if>
+        <if test="startTime != null and endTime != null">
+            to_char(s.create_time,'yyyy-MM-dd')>=#{startTime} AND to_char(s.create_time,'yyyy-MM-dd')&lt;=#{endTime}
+        </if>
+        AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        AND l.server_node_id=#{serverNodeId}
+        GROUP BY l.org_type_dm
+        )
+        /*分平台接收量*/
+        UNION ALL
+        (SELECT l.org_type_dm as orgType,
+        (COUNT(p.package_id)+COUNT(su.sub_package_id)) as packageCnt
+        FROM
+        LOGICAL_SERVER_NODE l
+        INNER JOIN MACHINE_NODE m ON m.server_node_id=l.server_node_id and m.NODE_TYPE_DM='01'
+        INNER JOIN data_node_process ps on ps.to_node_id=m.node_id
+        INNER JOIN MACHINE_NODE m2 on m2.node_id=ps.node_id and m2.node_type_dm='02'
+        INNER JOIN LOGICAL_SERVER_NODE l2 on l2.server_node_id=m2.server_node_id AND l.server_node_id=l2.server_node_id
+        INNER JOIN node_send_state s on s.process_id=ps.process_id and s.send_state_dm='30'
+        LEFT JOIN data_package p on p.package_id=ps.package_id
+        LEFT JOIN data_package_sub su on su.sub_package_id=ps.package_id
+        WHERE
+        <if test="trendDateType=='today'">TO_CHAR(s.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')</if>
+        <if test="trendDateType=='week'">TRUNC(s.create_time)>TRUNC(sysdate-(to_char(sysdate-1,'D')))</if>
+        <if test="trendDateType=='month'">TO_CHAR(s.create_time,'yyyy-MM')=TO_CHAR(sysdate,'yyyy-MM')</if>
+        <if test="trendDateType=='year'">TO_CHAR(s.create_time,'yyyy')=TO_CHAR(sysdate,'yyyy')</if>
+        <if test="startTime != null and endTime != null">
+            to_char(s.create_time,'yyyy-MM-dd')>=#{startTime} AND to_char(s.create_time,'yyyy-MM-dd')&lt;=#{endTime}
+        </if>
+        AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        AND l.server_node_id!=#{serverNodeId}
+        GROUP BY l.org_type_dm
+        )
+
+        ORDER BY packageCnt DESC
+    </select>
+
+    <select id="getSendTopForCenter" resultType="java.util.Map">
+        SELECT TEMP.org_type_dm as orgType,
+        (COUNT(TEMP.package_id)+COUNT(TEMP.sub_package_id)) as packageCnt
+        FROM
+        (
+
+        /*中心节点发送量*/
+        (
+        SELECT p.package_id, su.sub_package_id,l.org_type_dm
+        FROM
+        LOGICAL_SERVER_NODE l
+        INNER JOIN MACHINE_NODE m ON m.server_node_id=l.server_node_id and m.NODE_TYPE_DM='01'
+        INNER JOIN data_node_process ps on ps.node_id=m.node_id
+        INNER JOIN node_send_state s on s.process_id=ps.process_id and s.send_state_dm='30'
+        LEFT JOIN data_package p on p.package_id=ps.package_id
+        LEFT JOIN data_package_sub su on su.sub_package_id=ps.package_id
+        WHERE
+        <if test="trendDateType=='today'">TO_CHAR(s.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')</if>
+        <if test="trendDateType=='week'">TRUNC(s.create_time)>TRUNC(sysdate-(to_char(sysdate-1,'D')))</if>
+        <if test="trendDateType=='month'">TO_CHAR(s.create_time,'yyyy-MM')=TO_CHAR(sysdate,'yyyy-MM')</if>
+        <if test="trendDateType=='year'">TO_CHAR(s.create_time,'yyyy')=TO_CHAR(sysdate,'yyyy')</if>
+        <if test="startTime != null and endTime != null">
+            to_char(s.create_time,'yyyy-MM-dd')>=#{startTime} AND to_char(s.create_time,'yyyy-MM-dd')&lt;=#{endTime}
+        </if>
+        AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        AND l.server_node_id=#{serverNodeId}
+        )
+
+        /*中心平台发送失败量*/
+        UNION ALL
+        (
+        SELECT p.package_id, su.sub_package_id,l.org_type_dm
+        FROM
+        LOGICAL_SERVER_NODE l
+        INNER JOIN MACHINE_NODE m ON m.server_node_id=l.server_node_id and m.NODE_TYPE_DM='01'
+        inner join package_current_state ps on ps.node_id=m.node_id and ps.send_state_dm='00'
+        LEFT JOIN data_package p on p.package_id=ps.package_id
+        LEFT JOIN data_package_sub su on su.sub_package_id=ps.package_id
+        WHERE
+        <if test="trendDateType=='today'">TO_CHAR(ps.update_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')</if>
+        <if test="trendDateType=='week'">TRUNC(ps.update_time)>TRUNC(sysdate-(to_char(sysdate-1,'D')))</if>
+        <if test="trendDateType=='month'">TO_CHAR(ps.update_time,'yyyy-MM')=TO_CHAR(sysdate,'yyyy-MM')</if>
+        <if test="trendDateType=='year'">TO_CHAR(ps.update_time,'yyyy')=TO_CHAR(sysdate,'yyyy')</if>
+        <if test="startTime != null and endTime != null">
+            to_char(ps.update_time,'yyyy-MM-dd')>=#{startTime} AND to_char(ps.update_time,'yyyy-MM-dd')&lt;=#{endTime}
+        </if>
+        AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        AND l.server_node_id=#{serverNodeId}
+        )
+
+        /*分平台发送量*/
+        UNION ALL
+        (
+        SELECT p.package_id, su.sub_package_id,l.org_type_dm
+        FROM
+        LOGICAL_SERVER_NODE l
+        INNER JOIN MACHINE_NODE m ON m.server_node_id=l.server_node_id and m.NODE_TYPE_DM='01'
+        INNER JOIN data_node_process ps on ps.from_node_id=m.node_id
+        INNER JOIN MACHINE_NODE m2 on m2.node_id=ps.node_id and m2.node_type_dm='02'
+        INNER JOIN LOGICAL_SERVER_NODE l2 on l2.server_node_id=m2.server_node_id and l2.server_node_type_dm='01'
+        /*中心节点*/
+        INNER JOIN node_send_state s on s.process_id=ps.process_id and s.send_state_dm='20'
+        LEFT JOIN data_package p on p.package_id=ps.package_id
+        LEFT JOIN data_package_sub su on su.sub_package_id=ps.package_id
+        WHERE
+        <if test="trendDateType=='today'">TO_CHAR(s.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')</if>
+        <if test="trendDateType=='week'">TRUNC(s.create_time)>TRUNC(sysdate-(to_char(sysdate-1,'D')))</if>
+        <if test="trendDateType=='month'">TO_CHAR(s.create_time,'yyyy-MM')=TO_CHAR(sysdate,'yyyy-MM')</if>
+        <if test="trendDateType=='year'">TO_CHAR(s.create_time,'yyyy')=TO_CHAR(sysdate,'yyyy')</if>
+        <if test="startTime != null and endTime != null">
+            to_char(s.create_time,'yyyy-MM-dd')>=#{startTime} AND to_char(s.create_time,'yyyy-MM-dd')&lt;=#{endTime}
+        </if>
+        AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        AND l.server_node_id!=#{serverNodeId}
+        )
+
+
+        ) TEMP
+        GROUP BY TEMP.org_type_dm
+        ORDER BY packageCnt DESC
+    </select>
+
+    <select id="getPackStatResultForCenter" resultType="java.util.Map">
+    select 'SEND_FAIL_TODAY' AS STAT_TYPE, COUNT(s.package_id) as STAT_COUNT, (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0)) as STAT_SUM
+    from  LOGICAL_SERVER_NODE n
+    inner join machine_node m on m.server_node_id=n.server_node_id and m.NODE_TYPE_DM='01'
+    INNER JOIN package_current_state s on s.node_id=m.node_id and s.send_state_dm='00'
+    left join data_package p on p.package_id=s.package_id
+    left join data_package_sub su on su.sub_package_id=s.package_id
+    where n.SERVER_NODE_ID=#{serverNodeId} AND TO_CHAR(s.update_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+
+    UNION ALL
+    SELECT 'SUCC_TODAY' AS STAT_TYPE, COUNT(ps.package_id) as STAT_COUNT, (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0)) as STAT_SUM
+    from  LOGICAL_SERVER_NODE n
+    inner join machine_node m on m.server_node_id=n.server_node_id and m.NODE_TYPE_DM='01'
+    INNER JOIN data_node_process ps on ps.node_id=m.node_id
+    INNER JOIN node_send_state s on s.process_id=ps.process_id and s.send_state_dm='30'
+    left join data_package p on p.package_id=ps.package_id
+    left join data_package_sub su on su.sub_package_id=ps.package_id
+    where n.SERVER_NODE_ID=#{serverNodeId} AND TO_CHAR(s.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+
+    UNION ALL
+    select 'RECV_TODAY' AS STAT_TYPE, COUNT(ps.package_id) as STAT_NUM, (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0)) as STAT_SUM
+    from  LOGICAL_SERVER_NODE n
+    inner join machine_node m on m.server_node_id=n.server_node_id and m.NODE_TYPE_DM='01'
+    INNER JOIN data_node_process ps on ps.node_id=m.node_id
+    INNER JOIN node_send_state s on s.process_id=ps.process_id and s.send_state_dm='20'
+    left join data_package p on p.package_id=ps.package_id
+    left join data_package_sub su on su.sub_package_id=ps.package_id
+    where n.SERVER_NODE_ID=#{serverNodeId} AND TO_CHAR(s.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+
+    </select>
+
+    <!--监控大屏数据包-->
+    <select id="selectAllForMonitorCenter" resultType="com.iflytek.dep.admin.model.vo.DataPackageVo">
+        select t.PACKAGE_ID as packageId, t.PACKAGE_SIZE as packageSize, t.CREATE_TIME as createTime,
+        t1.GLOBAL_STATE_DM as globalStateDm,
+        t1.UPDATE_TIME as updateTime,
+        (t1.UPDATE_TIME-t.CREATE_TIME)*24*3600 as spendTime,
+        t1.NODE_ID as nodeId,
+        t2.NODE_REMARK as nodeRemark
+        from DATA_PACKAGE t
+        left join PACKAGE_GLOBAL_STATE t1 on t.PACKAGE_ID=t1.PACKAGE_ID
+        left join MACHINE_NODE t2 on t1.NODE_ID=t2.NODE_ID
+        where 1=1
+        <if test="dataPackageDto.packageId != null and dataPackageDto.packageId != ''">
+            and t.PACKAGE_ID LIKE '%' || #{dataPackageDto.packageId,jdbcType=VARCHAR} || '%'
+        </if>
+        <if test="dataPackageDto.globalStateDm != null and dataPackageDto.globalStateDm=='today'">/*本日*/
+            and TO_CHAR(t.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')
+        </if>
+        <if test="dataPackageDto.globalStateDm != null and dataPackageDto.globalStateDm=='week'">/*本周*/
+            and TRUNC(t.create_time)>TRUNC(sysdate-(to_char(sysdate-1,'D')))
+        </if>
+        <if test="dataPackageDto.globalStateDm != null and dataPackageDto.globalStateDm=='00'">/*异常*/
+            and t1.GLOBAL_STATE_DM LIKE CONCAT(CONCAT('%',#{dataPackageDto.globalStateDm,jdbcType=VARCHAR}),'%')
+        </if>
+        <if test="dataPackageDto.createTimeStart != null and dataPackageDto.createTimeStart != ''">
+            <![CDATA[ AND t.CREATE_TIME >= CONCAT(#{dataPackageDto.createTimeStart,jdbcType=VARCHAR}," 00:00:00.000") ]]>
+        </if>
+        <if test="dataPackageDto.createTimeEnd != null and dataPackageDto.createTimeEnd != ''">
+            <![CDATA[ AND t.CREATE_TIME < CONCAT(#{dataPackageDto.createTimeEnd,jdbcType=VARCHAR}," 00:00:00.000") ]]>
+        </if>
+        ORDER BY t.CREATE_TIME DESC
+    </select>
+
+    <select id="packStateList" resultType="com.iflytek.dep.admin.model.vo.monitor.MonitorDisplayPackStateVo">
+        select n.node_id as nodeId, n.node_remark as nodeRemark,
+        t.operate_state_dm as operateStateDm,
+        p.send_state_dm as sendStateDm, p.create_time as createTime, t.create_time as updateTime
+        from node_operate_state t
+        inner join data_node_process ps on ps.process_id=t.process_id
+        inner join machine_node n on n.node_id=ps.node_id
+        inner join package_current_state p on p.node_id=n.node_id and p.package_id=ps.package_id
+        inner join logical_server_node s on s.server_node_id=n.server_node_id
+        where ps.package_id=#{packageId}
+    </select>
+
+    <select id="getTrendStatDataDayOrWeek" parameterType="com.iflytek.dep.admin.model.dto.monitor.TrendStatDataDto"
+            resultType="com.iflytek.dep.admin.model.vo.monitor.MonitorDisplayTrendDayOrWeekVo">
+        SELECT
+        sum(nvl(P.package_size,0)+nvl(su.package_size,0)) as trendSize,
+        l.SERVER_NODE_ID as serverNodeId
+        FROM node_send_state s
+        INNER JOIN data_node_process ps ON ps.process_id = s.process_id
+        INNER JOIN machine_node M ON M .node_id = ps.node_id AND M .NODE_TYPE_DM = '01'
+        INNER JOIN LOGICAL_SERVER_NODE l ON l.server_node_id = M .server_node_id
+        LEFT JOIN data_package P ON P.package_id = ps.package_id
+        LEFT JOIN data_package_sub su ON su.sub_package_id = ps.package_id
+        WHERE
+        <if test="sendOrRecv=='send'">s.send_state_dm = '30'</if>
+        <if test="sendOrRecv=='recv'">s.send_state_dm = '20'</if>
+        <if test="startTime != null and endTime != null">
+            AND to_char(s.create_time, 'yyyy-MM-dd HH:mm:ss')>=#{startTime}
+            AND to_char(s.create_time, 'yyyy-MM-dd HH:mm:ss')&lt;=#{endTime}
+        </if>
+        AND (P.package_id IS NOT NULL OR su.SUB_PACKAGE_ID IS NOT NULL)
+        GROUP BY l.SERVER_NODE_ID
+    </select>
+    <select id="getTrendStatDataDayOrWeekCenter" parameterType="com.iflytek.dep.admin.model.dto.monitor.TrendStatDataDto"
+            resultType="com.iflytek.dep.admin.model.vo.monitor.MonitorDisplayTrendDayOrWeekVo">
+        SELECT  l.SERVER_NODE_ID as serverNodeId,
+        (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0)) as trendSize
+        FROM
+        LOGICAL_SERVER_NODE l
+        INNER JOIN MACHINE_NODE m ON m.server_node_id=l.server_node_id and m.NODE_TYPE_DM='01'
+        <if test="sendOrRecv=='send'">
+            INNER JOIN data_node_process ps on ps.from_node_id=m.node_id
+        </if>
+        <if test="sendOrRecv=='recv'">
+            INNER JOIN data_node_process ps on ps.to_node_id=m.node_id
+        </if>
+        INNER JOIN MACHINE_NODE m2 on m2.node_id=ps.node_id and m2.node_type_dm='02'
+        INNER JOIN node_send_state s on s.process_id=ps.process_id
+        LEFT JOIN data_package p on p.package_id=ps.package_id
+        LEFT JOIN data_package_sub su on su.sub_package_id=ps.package_id
+        WHERE  s.send_state_dm='20'
+        <if test="startTime != null and endTime != null">
+            AND to_char(s.create_time, 'yyyy-MM-dd HH:mm:ss')>=#{startTime}
+            AND to_char(s.create_time, 'yyyy-MM-dd HH:mm:ss')&lt;=#{endTime}
+        </if>
+        AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        GROUP BY l.SERVER_NODE_ID
+
+        union
+
+        SELECT  l.SERVER_NODE_ID as serverNodeId,
+        (NVL(SUM(p.Package_Size),0)+NVL(SUM(su.Package_Size),0)) as trendSize
+        FROM
+        LOGICAL_SERVER_NODE l
+        INNER JOIN MACHINE_NODE m ON m.server_node_id=l.server_node_id and m.NODE_TYPE_DM='01'
+        INNER JOIN data_node_process ps on ps.node_id=m.node_id
+        INNER JOIN node_send_state s on s.process_id=ps.process_id
+        LEFT JOIN data_package p on p.package_id=ps.package_id
+        LEFT JOIN data_package_sub su on su.sub_package_id=ps.package_id
+        WHERE  s.send_state_dm='30'
+        <if test="startTime != null and endTime != null">
+            AND to_char(s.create_time, 'yyyy-MM-dd HH:mm:ss')>=#{startTime}
+            AND to_char(s.create_time, 'yyyy-MM-dd HH:mm:ss')&lt;=#{endTime}
+        </if>
+        AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+        GROUP BY l.SERVER_NODE_ID
+    </select>
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.admin.dao.ServerNodeTypeMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.admin.model.ServerNodeType">
+    <id column="SERVER_NODE_TYPE_DM" jdbcType="VARCHAR" property="serverNodeTypeDm" />
+    <result column="SERVER_NODE_TYPE_MC" jdbcType="VARCHAR" property="serverNodeTypeMc" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from SERVER_NODE_TYPE
+    where SERVER_NODE_TYPE_DM = #{serverNodeTypeDm,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.admin.model.ServerNodeType">
+    insert into SERVER_NODE_TYPE (SERVER_NODE_TYPE_DM, SERVER_NODE_TYPE_MC
+      )
+    values (#{serverNodeTypeDm,jdbcType=VARCHAR}, #{serverNodeTypeMc,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.admin.model.ServerNodeType">
+    update SERVER_NODE_TYPE
+    set SERVER_NODE_TYPE_MC = #{serverNodeTypeMc,jdbcType=VARCHAR}
+    where SERVER_NODE_TYPE_DM = #{serverNodeTypeDm,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select SERVER_NODE_TYPE_DM, SERVER_NODE_TYPE_MC
+    from SERVER_NODE_TYPE
+    where SERVER_NODE_TYPE_DM = #{serverNodeTypeDm,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select SERVER_NODE_TYPE_DM, SERVER_NODE_TYPE_MC
+    from SERVER_NODE_TYPE
+  </select>
+</mapper>

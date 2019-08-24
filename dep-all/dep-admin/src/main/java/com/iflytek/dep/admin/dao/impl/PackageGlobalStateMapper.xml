@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.admin.dao.PackageGlobalStateMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.admin.model.PackageGlobalState">
+    <id column="PACKAGE_ID" jdbcType="VARCHAR" property="packageId" />
+    <id column="TO_NODE_ID" jdbcType="VARCHAR" property="toNodeId" />
+    <result column="NODE_ID" jdbcType="VARCHAR" property="nodeId" />
+    <result column="GLOBAL_STATE_DM" jdbcType="VARCHAR" property="globalStateDm" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="FLAG_CONFIRM_TYPE" jdbcType="VARCHAR" property="flagConfirmType" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="map">
+    delete from PACKAGE_GLOBAL_STATE
+    where PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+      and TO_NODE_ID = #{toNodeId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.admin.model.PackageGlobalState">
+    insert into PACKAGE_GLOBAL_STATE (PACKAGE_ID, TO_NODE_ID, NODE_ID, 
+      GLOBAL_STATE_DM, CREATE_TIME, UPDATE_TIME, FLAG_CONFIRM_TYPE
+      )
+    values (#{packageId,jdbcType=VARCHAR}, #{toNodeId,jdbcType=VARCHAR}, #{nodeId,jdbcType=VARCHAR}, 
+      #{globalStateDm,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{flagConfirmType,jdbcType=VARCHAR}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.admin.model.PackageGlobalState">
+    update PACKAGE_GLOBAL_STATE
+    set NODE_ID = #{nodeId,jdbcType=VARCHAR},
+      GLOBAL_STATE_DM = #{globalStateDm,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      FLAG_CONFIRM_TYPE = #{flagConfirmType,jdbcType=VARCHAR}
+    where PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+      and TO_NODE_ID = #{toNodeId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="map" resultMap="BaseResultMap">
+    select PACKAGE_ID, TO_NODE_ID, NODE_ID, GLOBAL_STATE_DM, CREATE_TIME, UPDATE_TIME,FLAG_CONFIRM_TYPE
+    from PACKAGE_GLOBAL_STATE
+    where PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+      and TO_NODE_ID = #{toNodeId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select PACKAGE_ID, TO_NODE_ID, NODE_ID, GLOBAL_STATE_DM, CREATE_TIME, UPDATE_TIME,FLAG_CONFIRM_TYPE
+    from PACKAGE_GLOBAL_STATE
+  </select>
+  <update id="updateStateByIds">
+    update PACKAGE_GLOBAL_STATE t
+    set t.GLOBAL_STATE_DM = '02',
+    t.FLAG_CONFIRM_TYPE = '1',
+    t.UPDATE_TIME = sysdate
+    where t.PACKAGE_ID like '%' ||#{packageId,jdbcType=VARCHAR}|| '%'
+    and t.TO_NODE_ID = #{toNode,jdbcType=VARCHAR}
+  </update>
+</mapper>

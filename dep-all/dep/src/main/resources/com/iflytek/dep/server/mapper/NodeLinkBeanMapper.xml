@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.server.mapper.NodeLinkBeanMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.server.model.NodeLinkBean">
+    <id column="LINK_ID" jdbcType="VARCHAR" property="linkId" />
+    <result column="PACKAGE_ID" jdbcType="VARCHAR" property="packageId" />
+    <result column="TO_NODE_ID" jdbcType="VARCHAR" property="toNodeId" />
+    <result column="LEFT_NODE_ID" jdbcType="VARCHAR" property="leftNodeId" />
+    <result column="RIGHT_NODE_ID" jdbcType="VARCHAR" property="rightNodeId" />
+    <result column="ORDER_ID" jdbcType="DECIMAL" property="orderId" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from NODE_LINK
+    where LINK_ID = #{linkId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.server.model.NodeLinkBean">
+    insert into NODE_LINK (LINK_ID, PACKAGE_ID, TO_NODE_ID, 
+      LEFT_NODE_ID, RIGHT_NODE_ID, ORDER_ID
+      )
+    values (#{linkId,jdbcType=VARCHAR}, #{packageId,jdbcType=VARCHAR}, #{toNodeId,jdbcType=VARCHAR}, 
+      #{leftNodeId,jdbcType=VARCHAR}, #{rightNodeId,jdbcType=VARCHAR}, #{orderId,jdbcType=DECIMAL}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.server.model.NodeLinkBean">
+    update NODE_LINK
+    set PACKAGE_ID = #{packageId,jdbcType=VARCHAR},
+      TO_NODE_ID = #{toNodeId,jdbcType=VARCHAR},
+      LEFT_NODE_ID = #{leftNodeId,jdbcType=VARCHAR},
+      RIGHT_NODE_ID = #{rightNodeId,jdbcType=VARCHAR},
+      ORDER_ID = #{orderId,jdbcType=DECIMAL}
+    where LINK_ID = #{linkId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select LINK_ID, PACKAGE_ID, TO_NODE_ID, LEFT_NODE_ID, RIGHT_NODE_ID, ORDER_ID
+    from NODE_LINK
+    where LINK_ID = #{linkId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select LINK_ID, PACKAGE_ID, TO_NODE_ID, LEFT_NODE_ID, RIGHT_NODE_ID, ORDER_ID
+    from NODE_LINK
+  </select>
+
+  <insert id="insertList" parameterType="java.util.List">
+
+        insert into NODE_LINK (LINK_ID, PACKAGE_ID, TO_NODE_ID,
+          LEFT_NODE_ID, RIGHT_NODE_ID,ORDER_ID)
+        <foreach collection="list" item="item" index="index" separator="union all">
+            ( select
+            #{item.linkId,jdbcType=VARCHAR} ,
+            #{item.packageId,jdbcType=VARCHAR} ,
+            #{item.toNodeId,jdbcType=VARCHAR} ,
+            #{item.leftNodeId,jdbcType=VARCHAR} ,
+            #{item.rightNodeId,jdbcType=VARCHAR},
+            #{item.orderId,jdbcType=VARCHAR}
+            from dual
+            )
+        </foreach>
+  </insert>
+
+  <select id="getLinkHead" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select LINK_ID, PACKAGE_ID, TO_NODE_ID,  LEFT_NODE_ID, RIGHT_NODE_ID, ORDER_ID
+    from NODE_LINK
+    where PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+    and TO_NODE_ID = #{toNodeId,jdbcType=VARCHAR}
+    and ORDER_ID = 1
+  </select>
+
+  <select id="getLinkByCurNode" parameterType="com.iflytek.dep.server.model.NodeLinkBean" resultMap="BaseResultMap">
+    select LINK_ID, PACKAGE_ID, TO_NODE_ID,  LEFT_NODE_ID, RIGHT_NODE_ID, ORDER_ID
+    from NODE_LINK
+    where PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+    and TO_NODE_ID = #{toNodeId,jdbcType=VARCHAR}
+    and LEFT_NODE_ID = #{leftNodeId,jdbcType=VARCHAR}
+    and rownum = 1
+  </select>
+
+  <select id="getLinkByRightNode" parameterType="com.iflytek.dep.server.model.NodeLinkBean" resultMap="BaseResultMap">
+    select LINK_ID, PACKAGE_ID, TO_NODE_ID,  LEFT_NODE_ID, RIGHT_NODE_ID, ORDER_ID
+    from NODE_LINK
+    where PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+    and TO_NODE_ID = #{toNodeId,jdbcType=VARCHAR}
+    and RIGHT_NODE_ID = #{rightNodeId,jdbcType=VARCHAR}
+    and rownum = 1
+  </select>
+
+  <select id="getLinkByAppId" resultMap="BaseResultMap" parameterType="map" >
+    select T.LINK_ID, T.PACKAGE_ID, T.TO_NODE_ID,  T.LEFT_NODE_ID, T.RIGHT_NODE_ID, T.ORDER_ID
+    from NODE_LINK T, NODE_APP T2
+    where T.TO_NODE_ID = T2.NODE_ID
+    and T.PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+    and T.LEFT_NODE_ID = #{leftNodeId,jdbcType=VARCHAR}
+    and T2.APP_ID = {appId,,jdbcType=VARCHAR}
+    and rownum = 1
+  </select>
+
+  <select id="getToNodeLink" resultMap="BaseResultMap" parameterType="map" >
+    select T.LINK_ID, T.PACKAGE_ID, T.TO_NODE_ID,  T.LEFT_NODE_ID, T.RIGHT_NODE_ID, T.ORDER_ID
+    from NODE_LINK T, NODE_APP T2
+    where T.TO_NODE_ID = T2.NODE_ID
+    and T.PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+    and T.LEFT_NODE_ID = #{leftNodeId,jdbcType=VARCHAR}
+    and T.RIGHT_NODE_ID = #{rightNodeId,jdbcType=VARCHAR}
+    and rownum = 1
+  </select>
+
+</mapper>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iflytek.dep.admin.dao.DicDepEtlJobMapper" >
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.admin.model.DicDepEtlJob" >
+    <id column="JOB_ID" property="jobId" jdbcType="VARCHAR" />
+    <result column="JOB_NAME" property="jobName" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="SCHEDULED" property="scheduled" jdbcType="VARCHAR" />
+    <result column="SCHEDULED_CRON" property="scheduledCron" jdbcType="VARCHAR" />
+    <result column="SCHEDULED_PARAM" property="scheduledParam" jdbcType="VARCHAR" />
+    <result column="FIXED_DELAY" jdbcType="NUMERIC"  property="fixDelay" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    JOB_ID, JOB_NAME, CREATE_TIME, SCHEDULED, SCHEDULED_CRON, SCHEDULED_PARAM,FIXED_DELAY
+  </sql>
+
+  <select id="selectByJobType" parameterType="java.lang.String" resultType="com.iflytek.dep.admin.model.JobType">
+    SELECT JOB_ID AS id,
+            JOB_NAME AS name
+    FROM DIC_DEP_ETL_JOB WHERE SCHEDULED=#{jobType} ORDER BY JOB_ID
+  </select>
+
+  <select id="listMonitorEtl"  resultType="com.iflytek.dep.admin.model.vo.monitor.MonitorEtlVo">
+    select t.job_name AS jobName,
+            t1.scheduled as scheduled,
+            sum(cast(t2.package_size as decimal(12,6))) as packageSize,
+            sum((NVL(t.dest_end_time,sysdate)-t.start_time)*24*60) as spendTime,
+            sum(cast(t2.package_size as decimal(12,6)))/sum((NVL(t.dest_end_time,sysdate)-t.start_time)*24*3600) as rate
+    from dep_etl_job_recorders t
+    left join dic_dep_etl_job t1 on t1.job_id=t.job_id
+    left join data_package t2 on t2.package_id= t.package_id || '.zip'
+    <where>
+      t.job_status = '1' and t.job_type ='0' and  t.is_empty_element = 0
+      <if test="monitorEtlDto.scheduled != null and monitorEtlDto.scheduled != ''">
+        and  t1.scheduled = #{monitorEtlDto.scheduled,jdbcType=VARCHAR}
+      </if>
+      <if test="monitorEtlDto.jobId != null and monitorEtlDto.jobId != ''">
+        and  t.job_id =#{monitorEtlDto.jobId,jdbcType=VARCHAR}
+      </if>
+      <if test="monitorEtlDto.startTime != null">
+        and t.start_time >= #{monitorEtlDto.startTime}
+      </if>
+      <if test="monitorEtlDto.endTime != null">
+        and t.start_time &lt;= #{monitorEtlDto.endTime}
+      </if>
+    </where>
+    group by t.job_name , t1.scheduled
+  </select>
+
+  <select id="selectCountEtlRecord" resultType="java.lang.Integer">
+    select count(t.id) from dep_etl_job_recorders t
+    left join dic_dep_etl_job t1 on t1.job_id=t.job_id
+    <where>
+      t.job_status = '1' and t.job_type ='0' and  t.is_empty_element = 0
+      <if test="monitorEtlDto.scheduled != null and monitorEtlDto.scheduled != ''">
+        and  t1.scheduled = #{monitorEtlDto.scheduled,jdbcType=VARCHAR}
+      </if>
+      <if test="monitorEtlDto.jobId != null and monitorEtlDto.jobId != ''">
+        and  t.job_id =#{monitorEtlDto.jobId,jdbcType=VARCHAR}
+      </if>
+      <if test="monitorEtlDto.startTime != null">
+        and t.start_time >= #{monitorEtlDto.startTime}
+      </if>
+      <if test="monitorEtlDto.endTime != null">
+        and t.start_time &lt;= #{monitorEtlDto.endTime}
+      </if>
+    </where>
+  </select>
+
+  <select id="selectEtlRecord" resultType="com.iflytek.dep.admin.model.EtlJobRecorders">
+    select t.ID as id ,
+            t.JOB_ID as jobId,
+            t.JOB_NAME as jobName,
+            t.JOB_TYPE as jobType,
+            t.START_TIME as startTime,
+            t.END_TIME as endTime,
+            t.JOB_STATUS as jobStatus,
+            t.PRE_JOB_KEY as preJobKey,
+            t.CURR_JOB_KEY as currJobKey,
+            t.IS_EMPTY_ELEMENT as isEmptyElement,
+            t.PACKAGE_ID as packageId,
+            t.DEST_END_TIME as destEndTime,
+            t.DEST_CALLBACK_INFO as destCallbackInfo,
+            t.JOB_PARAM as jobParam,
+            t.JOB_RESULT_INFO as jobResultInfo
+    from dep_etl_job_recorders t
+    left join dic_dep_etl_job t1 on t1.job_id=t.job_id
+    <where>
+      t.job_status = '1' and t.job_type ='0' and  t.is_empty_element = 0
+      <if test="monitorEtlDto.scheduled != null and monitorEtlDto.scheduled != ''">
+        and  t1.scheduled = #{monitorEtlDto.scheduled,jdbcType=VARCHAR}
+      </if>
+      <if test="monitorEtlDto.jobId != null and monitorEtlDto.jobId != ''">
+        and  t.job_id =#{monitorEtlDto.jobId,jdbcType=VARCHAR}
+      </if>
+      <if test="monitorEtlDto.startTime != null">
+        and t.start_time >= #{monitorEtlDto.startTime}
+      </if>
+      <if test="monitorEtlDto.endTime != null">
+        and t.start_time &lt;= #{monitorEtlDto.endTime}
+      </if>
+    </where>
+  </select>
+
+</mapper>

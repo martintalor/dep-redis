@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.server.mapper.NodeSendStateBeanMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.server.model.NodeSendStateBean">
+    <id column="UUID" jdbcType="VARCHAR" property="uuid" />
+    <result column="PROCESS_ID" jdbcType="VARCHAR" property="processId" />
+    <result column="SEND_STATE_DM" jdbcType="VARCHAR" property="sendStateDm" />
+    <result column="ORDER_ID" jdbcType="DECIMAL" property="orderId" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from NODE_SEND_STATE
+    where UUID = #{uuid,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.server.model.NodeSendStateBean">
+    insert into NODE_SEND_STATE (UUID, PROCESS_ID, SEND_STATE_DM, 
+      ORDER_ID, CREATE_TIME, UPDATE_TIME
+      )
+    values (#{uuid,jdbcType=VARCHAR}, #{processId,jdbcType=VARCHAR}, #{sendStateDm,jdbcType=VARCHAR}, 
+      #{orderId,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.server.model.NodeSendStateBean">
+    update NODE_SEND_STATE
+    set PROCESS_ID = #{processId,jdbcType=VARCHAR},
+      SEND_STATE_DM = #{sendStateDm,jdbcType=VARCHAR},
+      ORDER_ID = #{orderId,jdbcType=DECIMAL},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+    where UUID = #{uuid,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select UUID, PROCESS_ID, SEND_STATE_DM, ORDER_ID, CREATE_TIME, UPDATE_TIME
+    from NODE_SEND_STATE
+    where UUID = #{uuid,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select UUID, PROCESS_ID, SEND_STATE_DM, ORDER_ID, CREATE_TIME, UPDATE_TIME
+    from NODE_SEND_STATE
+  </select>
+
+  <select id="getMaxOrderId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select MAX(ORDER_ID) ORDER_ID
+    from NODE_SEND_STATE
+    where PROCESS_ID = #{processId,jdbcType=VARCHAR}
+  </select>
+</mapper>

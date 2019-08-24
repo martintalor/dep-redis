@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iflytek.dep.server.mapper.CaStepRecordersMapper" >
+
+    <resultMap id="BaseResultMap" type="com.iflytek.dep.server.model.CaStepRecorders" >
+        <id column="BIZ_SN" property="bizSn" jdbcType="VARCHAR" />
+        <result column="PACKAGE_ID" property="packageId" jdbcType="VARCHAR" />
+        <result column="FILE_URL" property="fileUrl" jdbcType="VARCHAR" />
+        <result column="EFS_URL" property="efsUrl" jdbcType="VARCHAR" />
+        <result column="CALLBACK_URL" property="callbackUrl" jdbcType="VARCHAR" />
+        <result column="MODE" property="mode" jdbcType="VARCHAR" />
+        <result column="CONTAINER_NAME" property="containerName" jdbcType="VARCHAR" />
+        <result column="RECEIVER" property="receiver" jdbcType="VARCHAR" />
+        <result column="CALL_STATUS" property="callStatus" jdbcType="DECIMAL" />
+        <result column="BACK_STATUS" property="backStatus" jdbcType="VARCHAR" />
+        <result column="EXECUTE_STATUS" property="executeStatus" jdbcType="DECIMAL" />
+        <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        BIZ_SN, PACKAGE_ID, FILE_URL, EFS_URL, CALLBACK_URL, "MODE", CALL_STATUS, BACK_STATUS, CREATE_TIME,CONTAINER_NAME,RECEIVER,EXECUTE_STATUS
+    </sql>
+
+    <select id="getAllRecords" resultMap="BaseResultMap"  >
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM
+        CA_STEP_RECORDERS T1
+
+    </select>
+
+    <select id="getNoExecuteRecords" resultMap="BaseResultMap"  >
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM
+        CA_STEP_RECORDERS T1
+        WHERE
+        NOT EXISTS (
+        SELECT
+        T2.BIZ_SN
+        FROM
+        CA_STEP_RECORDERS T2
+        WHERE
+        T1.PACKAGE_ID = T2.PACKAGE_ID
+        AND T2.EXECUTE_STATUS = 1
+        )
+
+    </select>
+
+    <select id="selectByPackageId" resultMap="BaseResultMap" parameterType="java.lang.String"  >
+        select
+        <include refid="Base_Column_List" />
+        from CA_STEP_RECORDERS
+        where package_id like CONCAT( #{packageId,jdbcType=VARCHAR},'%')
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from CA_STEP_RECORDERS
+        where BIZ_SN = #{bizSn,jdbcType=VARCHAR}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+        delete from CA_STEP_RECORDERS
+        where BIZ_SN = #{bizSn,jdbcType=VARCHAR}
+    </delete>
+
+    <insert id="insert" parameterType="com.iflytek.dep.server.model.CaStepRecorders" >
+        insert into CA_STEP_RECORDERS (BIZ_SN, PACKAGE_ID, FILE_URL,
+            EFS_URL, CALLBACK_URL, "MODE",
+            CALL_STATUS, BACK_STATUS, CREATE_TIME ,CONTAINER_NAME,RECEIVER
+            )
+        values (#{bizSn,jdbcType=VARCHAR}, #{packageId,jdbcType=VARCHAR}, #{fileUrl,jdbcType=VARCHAR},
+            #{efsUrl,jdbcType=VARCHAR}, #{callbackUrl,jdbcType=VARCHAR}, #{mode,jdbcType=VARCHAR},
+            #{callStatus,jdbcType=DECIMAL}, #{backStatus,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+            #{containerName,jdbcType=VARCHAR}, #{receiver,jdbcType=VARCHAR}
+            )
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.iflytek.dep.server.model.CaStepRecorders" >
+        insert into CA_STEP_RECORDERS
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="bizSn != null" >
+                BIZ_SN,
+            </if>
+            <if test="packageId != null" >
+                PACKAGE_ID,
+            </if>
+            <if test="fileUrl != null" >
+                FILE_URL,
+            </if>
+            <if test="efsUrl != null" >
+                EFS_URL,
+            </if>
+            <if test="callbackUrl != null" >
+                CALLBACK_URL,
+            </if>
+            <if test="mode != null" >
+                "MODE",
+            </if>
+            <if test="callStatus != null" >
+                CALL_STATUS,
+            </if>
+            <if test="backStatus != null" >
+                BACK_STATUS,
+            </if>
+            <if test="createTime != null" >
+                CREATE_TIME,
+            </if>
+            <if test="containerName != null" >
+                CONTAINER_NAME,
+            </if>
+            <if test="receiver != null" >
+                RECEIVER,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="bizSn != null" >
+                #{bizSn,jdbcType=VARCHAR},
+            </if>
+            <if test="packageId != null" >
+                #{packageId,jdbcType=VARCHAR},
+            </if>
+            <if test="fileUrl != null" >
+                #{fileUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="efsUrl != null" >
+                #{efsUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="callbackUrl != null" >
+                #{callbackUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="mode != null" >
+                #{mode,jdbcType=VARCHAR},
+            </if>
+            <if test="callStatus != null" >
+                #{callStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="backStatus != null" >
+                #{backStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="containerName != null" >
+                #{containerName,jdbcType=VARCHAR},
+            </if>
+            <if test="receiver != null" >
+                #{receiver,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.iflytek.dep.server.model.CaStepRecorders" >
+        update CA_STEP_RECORDERS
+        <set >
+            <if test="packageId != null" >
+                PACKAGE_ID = #{packageId,jdbcType=VARCHAR},
+            </if>
+            <if test="fileUrl != null" >
+                FILE_URL = #{fileUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="efsUrl != null" >
+                EFS_URL = #{efsUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="callbackUrl != null" >
+                CALLBACK_URL = #{callbackUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="mode != null" >
+                "MODE" = #{mode,jdbcType=VARCHAR},
+            </if>
+            <if test="callStatus != null" >
+                CALL_STATUS = #{callStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="backStatus != null" >
+                BACK_STATUS = #{backStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="containerName != null" >
+                CONTAINER_NAME = #{containerName,jdbcType=VARCHAR},
+            </if>
+            <if test="executeStatus != null" >
+                execute_status = #{executeStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="receiver != null" >
+                RECEIVER = #{receiver,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where BIZ_SN = #{bizSn,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.server.model.CaStepRecorders" >
+        update CA_STEP_RECORDERS
+        set PACKAGE_ID = #{packageId,jdbcType=VARCHAR},
+            FILE_URL = #{fileUrl,jdbcType=VARCHAR},
+            EFS_URL = #{efsUrl,jdbcType=VARCHAR},
+            CALLBACK_URL = #{callbackUrl,jdbcType=VARCHAR},
+            "MODE" = #{mode,jdbcType=VARCHAR},
+            CALL_STATUS = #{callStatus,jdbcType=DECIMAL},
+            BACK_STATUS = #{backStatus,jdbcType=VARCHAR},
+            CONTAINER_NAME = #{containerName,jdbcType=VARCHAR},
+            RECEIVER = #{receiver,jdbcType=VARCHAR},
+            CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+        where BIZ_SN = #{bizSn,jdbcType=VARCHAR}
+    </update>
+</mapper>

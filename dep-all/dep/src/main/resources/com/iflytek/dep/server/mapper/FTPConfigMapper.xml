@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.server.mapper.FTPConfigMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.server.model.FTPConfig">
+    <id column="FTP_ID" jdbcType="VARCHAR" property="ftpId" />
+    <result column="NODE_ID" jdbcType="VARCHAR" property="nodeId" />
+    <result column="FTP_IP" jdbcType="VARCHAR" property="ftpIp" />
+    <result column="FTP_PORT" jdbcType="DECIMAL" property="ftpPort" />
+    <result column="USERNAME" jdbcType="VARCHAR" property="username" />
+    <result column="PASSWORD" jdbcType="VARCHAR" property="password" />
+    <result column="DATA_PACKAGE_FOLDER_UP" jdbcType="VARCHAR" property="dataPackageFolderUp" />
+    <result column="DATA_PACKAGE_FOLDER_DOWN" jdbcType="VARCHAR" property="dataPackageFolderDown" />
+    <result column="ACK_PACKAGE_FOLDER_UP" jdbcType="VARCHAR" property="ackPackageFolderUp" />
+    <result column="ACK_PACKAGE_FOLDER_DOWN" jdbcType="VARCHAR" property="ackPackageFolderDown" />
+    <result column="TMP_PACKAGE_FOLDER" jdbcType="VARCHAR" property="tmpPackageFolder" />
+    <result column="CONNECT_MAX" jdbcType="DECIMAL" property="connectMax" />
+    <result column="TIMEOUT" jdbcType="DECIMAL" property="timeout" />
+    <result column="HEARTBEAT" jdbcType="DECIMAL" property="heartbeat" />
+    <result column="NET_BRAKE_TYPE" jdbcType="VARCHAR" property="netBrakeType" />
+  </resultMap>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select FTP_ID, NODE_ID, FTP_IP, FTP_PORT, USERNAME, PASSWORD, DATA_PACKAGE_FOLDER_UP, 
+    DATA_PACKAGE_FOLDER_DOWN, ACK_PACKAGE_FOLDER_UP, ACK_PACKAGE_FOLDER_DOWN, TMP_PACKAGE_FOLDER, 
+    CONNECT_MAX, TIMEOUT, HEARTBEAT
+    from FTP_CONFIG
+    where FTP_ID = #{ftpId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select FTP_ID, NODE_ID, FTP_IP, FTP_PORT, USERNAME, PASSWORD, DATA_PACKAGE_FOLDER_UP, 
+    DATA_PACKAGE_FOLDER_DOWN, ACK_PACKAGE_FOLDER_UP, ACK_PACKAGE_FOLDER_DOWN, TMP_PACKAGE_FOLDER, 
+    CONNECT_MAX, TIMEOUT, HEARTBEAT
+    from FTP_CONFIG
+  </select>
+  <select id="selectByNodeId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select FTP_ID, NODE_ID, FTP_IP, FTP_PORT, USERNAME, PASSWORD, DATA_PACKAGE_FOLDER_UP,
+    DATA_PACKAGE_FOLDER_DOWN, ACK_PACKAGE_FOLDER_UP, ACK_PACKAGE_FOLDER_DOWN, TMP_PACKAGE_FOLDER,
+    CONNECT_MAX, TIMEOUT, HEARTBEAT
+    from FTP_CONFIG
+    where NODE_ID = #{nodeId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByServerNodeId"  parameterType="java.lang.String" resultMap="BaseResultMap">
+    select * from FTP_CONFIG t
+    where t.NODE_ID in (select t1.NODE_ID from MACHINE_NODE t1 where t1.SERVER_NODE_ID=#{serverNodeId,jdbcType=VARCHAR})
+  </select>
+</mapper>

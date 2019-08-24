@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.admin.dao.FTPConfigMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.admin.model.FTPConfig">
+    <id column="FTP_ID" jdbcType="VARCHAR" property="ftpId" />
+    <result column="NODE_ID" jdbcType="VARCHAR" property="nodeId" />
+    <result column="FTP_IP" jdbcType="VARCHAR" property="ftpIp" />
+    <result column="FTP_PORT" jdbcType="DECIMAL" property="ftpPort" />
+    <result column="USERNAME" jdbcType="VARCHAR" property="username" />
+    <result column="PASSWORD" jdbcType="VARCHAR" property="password" />
+    <result column="DATA_PACKAGE_FOLDER_UP" jdbcType="VARCHAR" property="dataPackageFolderUp" />
+    <result column="DATA_PACKAGE_FOLDER_DOWN" jdbcType="VARCHAR" property="dataPackageFolderDown" />
+    <result column="ACK_PACKAGE_FOLDER_UP" jdbcType="VARCHAR" property="ackPackageFolderUp" />
+    <result column="ACK_PACKAGE_FOLDER_DOWN" jdbcType="VARCHAR" property="ackPackageFolderDown" />
+    <result column="TMP_PACKAGE_FOLDER" jdbcType="VARCHAR" property="tmpPackageFolder" />
+    <result column="CONNECT_MAX" jdbcType="DECIMAL" property="connectMax" />
+    <result column="TIMEOUT" jdbcType="DECIMAL" property="timeout" />
+    <result column="HEARTBEAT" jdbcType="DECIMAL" property="heartbeat" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from FTP_CONFIG
+    where FTP_ID = #{ftpId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.admin.model.FTPConfig">
+    insert into FTP_CONFIG (FTP_ID, NODE_ID, FTP_IP, 
+      FTP_PORT, USERNAME, PASSWORD, 
+      DATA_PACKAGE_FOLDER_UP, DATA_PACKAGE_FOLDER_DOWN, 
+      ACK_PACKAGE_FOLDER_UP, ACK_PACKAGE_FOLDER_DOWN, 
+      TMP_PACKAGE_FOLDER, CONNECT_MAX, TIMEOUT, 
+      HEARTBEAT)
+    values (#{ftpId,jdbcType=VARCHAR}, #{nodeId,jdbcType=VARCHAR}, #{ftpIp,jdbcType=VARCHAR}, 
+      #{ftpPort,jdbcType=DECIMAL}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{dataPackageFolderUp,jdbcType=VARCHAR}, #{dataPackageFolderDown,jdbcType=VARCHAR}, 
+      #{ackPackageFolderUp,jdbcType=VARCHAR}, #{ackPackageFolderDown,jdbcType=VARCHAR}, 
+      #{tmpPackageFolder,jdbcType=VARCHAR}, #{connectMax,jdbcType=DECIMAL}, #{timeout,jdbcType=DECIMAL}, 
+      #{heartbeat,jdbcType=DECIMAL})
+  </insert>
+  <update id="updateByNodeId" parameterType="com.iflytek.dep.admin.model.FTPConfig">
+    update FTP_CONFIG
+    <set>
+      <if test="ftpConfig.ftpIp != null and ftpConfig.ftpIp != ''">
+        FTP_IP = #{ftpConfig.ftpIp,jdbcType=VARCHAR},
+      </if>
+      <if test="ftpConfig.ftpPort != null and ftpConfig.ftpPort != ''">
+        FTP_PORT = #{ftpConfig.ftpPort,jdbcType=DECIMAL},
+      </if>
+      <if test="ftpConfig.username != null and ftpConfig.username != ''">
+        USERNAME = #{ftpConfig.username,jdbcType=VARCHAR},
+      </if>
+      <if test="ftpConfig.password != null and ftpConfig.password != ''">
+        PASSWORD = #{ftpConfig.password,jdbcType=VARCHAR},
+      </if>
+      <if test="ftpConfig.dataPackageFolderUp != null and ftpConfig.dataPackageFolderUp != ''">
+        DATA_PACKAGE_FOLDER_UP = #{ftpConfig.dataPackageFolderUp,jdbcType=VARCHAR},
+      </if>
+      <if test="ftpConfig.dataPackageFolderDown != null and ftpConfig.dataPackageFolderDown != ''">
+        DATA_PACKAGE_FOLDER_DOWN = #{ftpConfig.dataPackageFolderDown,jdbcType=VARCHAR},
+      </if>
+      <if test="ftpConfig.ackPackageFolderUp != null and ftpConfig.ackPackageFolderUp != ''">
+        ACK_PACKAGE_FOLDER_UP = #{ftpConfig.ackPackageFolderUp,jdbcType=VARCHAR},
+      </if>
+      <if test="ftpConfig.ackPackageFolderDown != null and ftpConfig.ackPackageFolderDown != ''">
+        ACK_PACKAGE_FOLDER_DOWN = #{ftpConfig.ackPackageFolderDown,jdbcType=VARCHAR},
+      </if>
+      <if test="ftpConfig.tmpPackageFolder != null and ftpConfig.tmpPackageFolder != ''">
+        TMP_PACKAGE_FOLDER = #{ftpConfig.tmpPackageFolder,jdbcType=VARCHAR},
+      </if>
+      <if test="ftpConfig.connectMax > 0">
+        CONNECT_MAX = #{ftpConfig.connectMax,jdbcType=DECIMAL},
+      </if>
+      <if test="ftpConfig.timeout > 0">
+        TIMEOUT = #{ftpConfig.timeout,jdbcType=DECIMAL},
+      </if>
+      <if test="ftpConfig.heartbeat > 0">
+        HEARTBEAT = #{ftpConfig.heartbeat,jdbcType=DECIMAL}
+      </if>
+    </set>
+    where NODE_ID = #{ftpConfig.nodeId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select FTP_ID, NODE_ID, FTP_IP, FTP_PORT, USERNAME, PASSWORD, DATA_PACKAGE_FOLDER_UP, 
+    DATA_PACKAGE_FOLDER_DOWN, ACK_PACKAGE_FOLDER_UP, ACK_PACKAGE_FOLDER_DOWN, TMP_PACKAGE_FOLDER, 
+    CONNECT_MAX, TIMEOUT, HEARTBEAT
+    from FTP_CONFIG
+    where FTP_ID = #{ftpId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select FTP_ID, NODE_ID, FTP_IP, FTP_PORT, USERNAME, PASSWORD, DATA_PACKAGE_FOLDER_UP, 
+    DATA_PACKAGE_FOLDER_DOWN, ACK_PACKAGE_FOLDER_UP, ACK_PACKAGE_FOLDER_DOWN, TMP_PACKAGE_FOLDER, 
+    CONNECT_MAX, TIMEOUT, HEARTBEAT
+    from FTP_CONFIG
+  </select>
+  <select id="selectByNodeId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select FTP_ID, NODE_ID, FTP_IP, FTP_PORT, USERNAME, PASSWORD, DATA_PACKAGE_FOLDER_UP,
+    DATA_PACKAGE_FOLDER_DOWN, ACK_PACKAGE_FOLDER_UP, ACK_PACKAGE_FOLDER_DOWN, TMP_PACKAGE_FOLDER,
+    CONNECT_MAX, TIMEOUT, HEARTBEAT
+    from FTP_CONFIG
+    where NODE_ID = #{nodeId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByServerNodeId"  parameterType="java.lang.String" resultType="com.iflytek.dep.admin.model.vo.FTPConfigVo">
+    select t.FTP_ID as ftpId, t.FTP_IP as ftpIP, t.NODE_ID as nodeId, t1.NODE_REMARK as nodeRemark
+    from FTP_CONFIG t
+    left join MACHINE_NODE t1 on t.NODE_ID= t1.NODE_ID
+    where t.NODE_ID in (select t1.NODE_ID from MACHINE_NODE t1 where t1.SERVER_NODE_ID=#{serverNodeId,jdbcType=VARCHAR})
+  </select>
+
+  <select id="selectAllByServerNodeId"  parameterType="java.lang.String" resultMap="BaseResultMap">
+    select * from FTP_CONFIG t
+    where t.NODE_ID in (select t1.NODE_ID from MACHINE_NODE t1 where t1.SERVER_NODE_ID=#{serverNodeId,jdbcType=VARCHAR})
+  </select>
+
+  <delete id="deleteByNodeId" parameterType="java.lang.String">
+    delete from FTP_CONFIG
+    where NODE_ID = #{nodeId,jdbcType=VARCHAR}
+  </delete>
+</mapper>

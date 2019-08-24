@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.iflytek.dep.server.mapper.SendPackMapper">
+
+    <!-- DataPackBean Result Map-->
+    <resultMap id="BaseResultMap" type="com.iflytek.dep.server.model.DataPackBean">
+        <id column="PACKAGE_ID" jdbcType="VARCHAR" property="packageId" />
+        <result column="PACKAGE_SIZE" jdbcType="VARCHAR" property="packageSize" />
+        <result column="APP_ID_FROM" jdbcType="VARCHAR" property="appIdFrom" />
+        <result column="APP_ID_TO" jdbcType="VARCHAR" property="appIdTo" />
+        <result column="FOLDER_NAME" jdbcType="VARCHAR" property="folderName" />
+        <result column="FOLDER_PATH" jdbcType="VARCHAR" property="folderPath" />
+        <result column="SEND_LEVEL" jdbcType="VARCHAR" property="sendLevel" />
+        <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+
+
+    <select id="getDataPackInfo" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select PACKAGE_ID, PACKAGE_SIZE, APP_ID_FROM, APP_ID_TO, FOLDER_NAME, FOLDER_PATH,
+    SEND_LEVEL, CREATE_TIME
+    from DATA_PACKAGE
+    where PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+  </select>
+
+</mapper>

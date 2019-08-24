@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iflytek.dep.admin.dao.NodeRouteMapper" >
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.admin.model.vo.NodeRouteVo" >
+    <id column="LEFT_NODE_ID" property="leftNodeId" jdbcType="VARCHAR" />
+    <id column="RIGHT_NODE_ID" property="rightNodeId" jdbcType="VARCHAR" />
+    <result column="LEFT_SERVER_NODE" property="leftServerNode" jdbcType="VARCHAR" />
+    <result column="RIGHT_SERVER_NODE" property="rightServerNode" jdbcType="VARCHAR" />
+    <result column="ROUTE_NAME" property="routeName" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="leftNodeName" property="leftNodeName" jdbcType="VARCHAR" />
+    <result column="rightNodeName" property="rightNodeName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    LEFT_NODE_ID, RIGHT_NODE_ID, LEFT_SERVER_NODE, RIGHT_SERVER_NODE, ROUTE_NAME, CREATE_TIME
+  </sql>
+  <select id="selectBy" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from NODE_ROUTE
+    where LEFT_NODE_ID = #{leftNodeId,jdbcType=VARCHAR}
+      and RIGHT_NODE_ID = #{rightNodeId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="com.iflytek.dep.admin.model.NodeRoute" >
+    delete from NODE_ROUTE
+    where LEFT_NODE_ID = #{leftNodeId,jdbcType=VARCHAR}
+      and RIGHT_NODE_ID = #{rightNodeId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insertSelective" parameterType="com.iflytek.dep.admin.model.NodeRoute" >
+    insert into NODE_ROUTE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="leftNodeId != null" >
+        LEFT_NODE_ID,
+      </if>
+      <if test="rightNodeId != null" >
+        RIGHT_NODE_ID,
+      </if>
+      <if test="leftServerNode != null" >
+        LEFT_SERVER_NODE,
+      </if>
+      <if test="rightServerNode != null" >
+        RIGHT_SERVER_NODE,
+      </if>
+      <if test="routeName != null" >
+        ROUTE_NAME,
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="leftNodeId != null" >
+        #{leftNodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="rightNodeId != null" >
+        #{rightNodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="leftServerNode != null" >
+        #{leftServerNode,jdbcType=VARCHAR},
+      </if>
+      <if test="rightServerNode != null" >
+        #{rightServerNode,jdbcType=VARCHAR},
+      </if>
+      <if test="routeName != null" >
+        #{routeName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.iflytek.dep.admin.model.NodeRoute" >
+    update NODE_ROUTE
+    <set >
+      <if test="leftServerNode != null" >
+        LEFT_SERVER_NODE = #{leftServerNode,jdbcType=VARCHAR},
+      </if>
+      <if test="rightServerNode != null" >
+        RIGHT_SERVER_NODE = #{rightServerNode,jdbcType=VARCHAR},
+      </if>
+      <if test="routeName != null" >
+        ROUTE_NAME=#{routeName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME=#{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where LEFT_NODE_ID = #{leftNodeId,jdbcType=VARCHAR}
+      and RIGHT_NODE_ID = #{rightNodeId,jdbcType=VARCHAR}
+  </update>
+
+  <select id="selectAll" resultMap="BaseResultMap" parameterType="com.iflytek.dep.admin.model.dto.NodeRouteDto" >
+    select r.*, m1.NODE_REMARK as leftNodeName, m2.NODE_REMARK as rightNodeName
+    from NODE_ROUTE r
+    left join MACHINE_NODE m1 ON m1.NODE_ID=r.LEFT_NODE_ID
+    left join MACHINE_NODE m2 ON m2.NODE_ID=r.RIGHT_NODE_ID
+    where 1=1
+      <if test="routeName != null">AND r.ROUTE_NAME LIKE '%' || #{routeName} || '%' ESCAPE '\'</if>
+      <if test="createTimeStart != null">AND to_char(r.CREATE_TIME,'yyyy-MM-dd')>=#{createTimeStart}</if>
+      <if test="createTimeEnd != null">AND to_char(r.CREATE_TIME,'yyyy-MM-dd')&lt;=#{createTimeEnd}</if>
+    ORDER BY r.CREATE_TIME DESC
+  </select>
+  
+  <delete id="deleteList" parameterType="java.util.List">
+    delete from NODE_ROUTE where
+    <foreach collection="list" item="item" index="index" separator="or">
+      ( LEFT_NODE_ID=#{item.leftNodeId,jdbcType=VARCHAR}
+      AND RIGHT_NODE_ID=#{item.rightNodeId,jdbcType=VARCHAR} )
+    </foreach>
+  </delete>
+
+</mapper>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.admin.dao.DEPServerMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.admin.model.DEPServer">
+    <id column="DEP_SERVER_ID" jdbcType="VARCHAR" property="depServerId" />
+    <result column="DEP_SERVER_REMARK" jdbcType="VARCHAR" property="depServerRemark" />
+    <result column="SERVER_NODE_ID" jdbcType="VARCHAR" property="serverNodeId" />
+    <result column="DEP_SERVER_IP" jdbcType="VARCHAR" property="depServerIp" />
+    <result column="FLAG_DELETE" jdbcType="VARCHAR" property="flagDelete" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from DEP_SERVER
+    where DEP_SERVER_ID = #{depServerId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.admin.model.DEPServer">
+    insert into DEP_SERVER (DEP_SERVER_ID, DEP_SERVER_REMARK, SERVER_NODE_ID, 
+      DEP_SERVER_IP, FLAG_DELETE)
+    values (#{depServerId,jdbcType=VARCHAR}, #{depServerRemark,jdbcType=VARCHAR}, #{serverNodeId,jdbcType=VARCHAR}, 
+      #{depServerIp,jdbcType=VARCHAR}, #{flagDelete,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.admin.model.DEPServer">
+    update DEP_SERVER
+    <set>
+      <if test="depServer.depServerRemark != null and depServer.depServerRemark != ''">
+        DEP_SERVER_REMARK = #{depServer.depServerRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="depServer.serverNodeId != null and depServer.serverNodeId != ''">
+        SERVER_NODE_ID = #{depServer.serverNodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="depServer.depServerIp!= null and depServer.depServerIp != ''">
+        DEP_SERVER_IP = #{depServer.depServerIp,jdbcType=VARCHAR},
+      </if>
+      <if test="depServer.flagDelete!= null and depServer.flagDelete != ''">
+        FLAG_DELETE = #{depServer.flagDelete,jdbcType=VARCHAR}
+      </if>
+    </set>
+    where DEP_SERVER_ID = #{depServer.depServerId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select DEP_SERVER_ID, DEP_SERVER_REMARK, SERVER_NODE_ID, DEP_SERVER_IP, FLAG_DELETE
+    from DEP_SERVER
+    where DEP_SERVER_ID = #{depServerId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultType="com.iflytek.dep.admin.model.vo.DEPServerVo">
+    select t.DEP_SERVER_ID as depServerId, t.DEP_SERVER_REMARK as depServerRemark,
+    t.SERVER_NODE_ID as serverNodeId, t.DEP_SERVER_IP as depServerIp, t1.SERVER_NODE_NAME as serverNodeRemark
+    from DEP_SERVER t
+    left join LOGICAL_SERVER_NODE t1 on t.SERVER_NODE_ID = t1.SERVER_NODE_ID
+    <where>
+      <if test="depServerDto.depServerRemark != null and depServerDto.depServerRemark != ''">
+        and t.DEP_SERVER_REMARK LIKE CONCAT(CONCAT('%',#{depServerDto.depServerRemark,jdbcType=VARCHAR}),'%')
+      </if>
+      <if test="depServerDto.depServerIp != null and depServerDto.depServerIp != ''">
+        and t.DEP_SERVER_IP LIKE CONCAT(CONCAT('%',#{depServerDto.depServerIp,jdbcType=VARCHAR}),'%')
+      </if>
+    </where>
+  </select>
+  <select id="getDEPServerNameById" parameterType="java.lang.String"  resultType="java.lang.String">
+    select DEP_SERVER_REMARK from DEP_SERVER
+    where SERVER_NODE_ID = #{serverNodeId,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectByServerNodeId" resultType="com.iflytek.dep.admin.model.DEPServer">
+    select t.DEP_SERVER_ID as depServerId, t.DEP_SERVER_REMARK as depServerRemark,
+    t.SERVER_NODE_ID as serverNodeId, t.DEP_SERVER_IP as depServerIp, t1.SERVER_NODE_NAME as serverNodeRemark
+    from DEP_SERVER t
+    left join LOGICAL_SERVER_NODE t1 on t.SERVER_NODE_ID = t1.SERVER_NODE_ID
+    <where>
+      <if test="serverNodeId != null and serverNodeId != ''">
+        and t.SERVER_NODE_ID = #{serverNodeId,jdbcType=VARCHAR}
+      </if>
+    </where>
+  </select>
+</mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.admin.dao.DataNodeProcessMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.admin.model.DataNodeProcess">
+    <id column="PROCESS_ID" jdbcType="VARCHAR" property="processId" />
+    <result column="PACKAGE_ID" jdbcType="VARCHAR" property="packageId" />
+    <result column="NODE_ID" jdbcType="VARCHAR" property="nodeId" />
+    <result column="TO_NODE_ID" jdbcType="VARCHAR" property="toNodeId" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from DATA_NODE_PROCESS
+    where PROCESS_ID = #{processId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.admin.model.DataNodeProcess">
+    insert into DATA_NODE_PROCESS (PROCESS_ID, PACKAGE_ID, NODE_ID, 
+      TO_NODE_ID, CREATE_TIME)
+    values (#{processId,jdbcType=VARCHAR}, #{packageId,jdbcType=VARCHAR}, #{nodeId,jdbcType=VARCHAR}, 
+      #{toNodeId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.admin.model.DataNodeProcess">
+    update DATA_NODE_PROCESS
+    set PACKAGE_ID = #{packageId,jdbcType=VARCHAR},
+      NODE_ID = #{nodeId,jdbcType=VARCHAR},
+      TO_NODE_ID = #{toNodeId,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+    where PROCESS_ID = #{processId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select PROCESS_ID, PACKAGE_ID, NODE_ID, TO_NODE_ID, CREATE_TIME
+    from DATA_NODE_PROCESS
+    where PROCESS_ID = #{processId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select PROCESS_ID, PACKAGE_ID, NODE_ID, TO_NODE_ID, CREATE_TIME
+    from DATA_NODE_PROCESS
+  </select>
+  <select id="selectByIDs"  resultType="com.iflytek.dep.admin.model.vo.OperateStateVo">
+    select t1.UUID as id,
+    t1.CREATE_TIME as createTime,
+    t1.UPDATE_TIME as updateTime,
+    t1.SPEND_TIME as spendTime,
+    t1.OPERATE_STATE_DM as operateStateDm,
+    t1.ORDER_ID as orderId,
+    t.TO_NODE_ID as toNodeId,
+    t2.NODE_REMARK as toNodeRemark
+    from DATA_NODE_PROCESS t
+    inner join NODE_OPERATE_STATE t1 on t.PROCESS_ID = t1.PROCESS_ID
+    left join MACHINE_NODE t2 on t2.NODE_ID = t.TO_NODE_ID
+    where t.PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+    and t.NODE_ID = #{nodeId,jdbcType=VARCHAR}
+    and t.TO_NODE_ID = #{toNode,jdbcType=VARCHAR}
+    order by t1.ORDER_ID
+  </select>
+</mapper>

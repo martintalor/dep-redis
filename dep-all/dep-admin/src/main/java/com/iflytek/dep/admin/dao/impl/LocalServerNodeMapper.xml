@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.admin.dao.LocalServerNodeMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.admin.model.LocalServerNode">
+    <id column="SERVER_NODE_ID" jdbcType="VARCHAR" property="serverNodeId" />
+    <result column="SERVER_NODE_NAME" jdbcType="VARCHAR" property="serverNodeName" />
+    <result column="ORG_TYPE_DM" jdbcType="VARCHAR" property="orgTypeDm" />
+    <result column="SERVER_NODE_TYPE_DM" jdbcType="VARCHAR" property="serverNodeTypeDm" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from LOGICAL_SERVER_NODE
+    where SERVER_NODE_ID = #{serverNodeId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.admin.model.LocalServerNode">
+    insert into LOGICAL_SERVER_NODE (SERVER_NODE_ID, SERVER_NODE_NAME, ORG_TYPE_DM, 
+      SERVER_NODE_TYPE_DM)
+    values (#{serverNodeId,jdbcType=VARCHAR}, #{serverNodeName,jdbcType=VARCHAR}, #{orgTypeDm,jdbcType=VARCHAR}, 
+      #{serverNodeTypeDm,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.admin.model.LocalServerNode">
+    update LOGICAL_SERVER_NODE
+    <set>
+      <if test="localServerNode.serverNodeName != null and localServerNode.serverNodeName != ''">
+        SERVER_NODE_NAME = #{localServerNode.serverNodeName,jdbcType=VARCHAR},
+      </if>
+      <if test="localServerNode.orgTypeDm != null and localServerNode.orgTypeDm != ''">
+        ORG_TYPE_DM = #{localServerNode.orgTypeDm,jdbcType=VARCHAR},
+      </if>
+      <if test="localServerNode.serverNodeTypeDm!= null and localServerNode.serverNodeTypeDm != ''">
+        SERVER_NODE_TYPE_DM = #{localServerNode.serverNodeTypeDm,jdbcType=VARCHAR}
+      </if>
+    </set>
+    where SERVER_NODE_ID = #{localServerNode.serverNodeId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select SERVER_NODE_ID, SERVER_NODE_NAME, ORG_TYPE_DM, SERVER_NODE_TYPE_DM
+    from LOGICAL_SERVER_NODE
+    where SERVER_NODE_ID = #{serverNodeId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultType="com.iflytek.dep.admin.model.vo.LocalServerNodeVo">
+    select t.SERVER_NODE_ID as serverNodeId,
+    t.SERVER_NODE_NAME  as serverNodeName,
+    t.ORG_TYPE_DM as orgTypeDm,
+    t1.ORG_TYPE_MC as orgTypeMc,
+    t.SERVER_NODE_TYPE_DM as serverNodeTypeDm,
+    t2.SERVER_NODE_TYPE_MC as serverNodeTypeMc
+    from LOGICAL_SERVER_NODE t
+    left join ORG_TYPE t1 on t1.ORG_TYPE_DM =t.ORG_TYPE_DM
+    left join SERVER_NODE_TYPE t2 on t2.SERVER_NODE_TYPE_DM =t.SERVER_NODE_TYPE_DM
+    <where>
+      <if test="localServerNodeDto.serverNodeId != null and localServerNodeDto.serverNodeId != ''">
+        and SERVER_NODE_ID LIKE CONCAT(CONCAT('%',#{localServerNodeDto.serverNodeId,jdbcType=VARCHAR}),'%')
+      </if>
+      <if test="localServerNodeDto.serverNodeName != null and localServerNodeDto.serverNodeName != ''">
+        and SERVER_NODE_NAME LIKE CONCAT(CONCAT('%',#{localServerNodeDto.serverNodeName,jdbcType=VARCHAR}),'%')
+      </if>
+    </where>
+  </select>
+  <select id="listNode" resultType="com.iflytek.dep.admin.model.vo.LocalServerNodeTypeVo">
+    select SERVER_NODE_ID as serverNodeId,
+    SERVER_NODE_NAME  as serverNodeName
+    from LOGICAL_SERVER_NODE
+  </select>
+</mapper>

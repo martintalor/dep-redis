@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.server.mapper.MachineNodeMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.server.model.MachineNodeBean">
+    <id column="NODE_ID" jdbcType="VARCHAR" property="nodeId" />
+    <result column="MACHINE_IP" jdbcType="VARCHAR" property="machineIp" />
+    <result column="SERVER_NODE_ID" jdbcType="VARCHAR" property="serverNodeId" />
+    <result column="NODE_REMARK" jdbcType="VARCHAR" property="nodeRemark" />
+    <result column="NODE_TYPE_DM" jdbcType="VARCHAR" property="nodeTypeDm" />
+    <result column="FLAG_ENABLE" jdbcType="VARCHAR" property="flagEnable" />
+    <result column="FLAG_DELETE" jdbcType="VARCHAR" property="flagDelete" />
+  </resultMap>
+
+  <select id="listDocServer" parameterType="java.lang.String" resultMap="BaseResultMap">
+    SELECT * FROM machine_node where NODE_TYPE_DM='01' and SERVER_NODE_ID=#{serverNodeId}
+  </select>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select NODE_ID, MACHINE_IP, SERVER_NODE_ID, NODE_REMARK, NODE_TYPE_DM, FLAG_ENABLE,
+    FLAG_DELETE
+    from MACHINE_NODE
+    where NODE_ID = #{nodeId,jdbcType=VARCHAR}
+  </select>
+
+</mapper>

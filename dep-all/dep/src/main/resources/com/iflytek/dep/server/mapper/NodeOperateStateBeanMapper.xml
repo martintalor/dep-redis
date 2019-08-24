@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.server.mapper.NodeOperateStateBeanMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.server.model.NodeOperateStateBean">
+    <id column="UUID" jdbcType="VARCHAR" property="uuid" />
+    <result column="PROCESS_ID" jdbcType="VARCHAR" property="processId" />
+    <result column="OPERATE_STATE_DM" jdbcType="VARCHAR" property="operateStateDm" />
+    <result column="ORDER_ID" jdbcType="DECIMAL" property="orderId" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from NODE_OPERATE_STATE
+    where UUID = #{uuid,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.server.model.NodeOperateStateBean">
+    insert into NODE_OPERATE_STATE (UUID, PROCESS_ID, OPERATE_STATE_DM, 
+      ORDER_ID, CREATE_TIME, UPDATE_TIME, SPEND_TIME
+      )
+    values (#{uuid,jdbcType=VARCHAR}, #{processId,jdbcType=VARCHAR}, #{operateStateDm,jdbcType=VARCHAR}, 
+      #{orderId,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+      #{spendTime,jdbcType=DECIMAL}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.server.model.NodeOperateStateBean">
+    update NODE_OPERATE_STATE
+    set PROCESS_ID = #{processId,jdbcType=VARCHAR},
+      OPERATE_STATE_DM = #{operateStateDm,jdbcType=VARCHAR},
+      ORDER_ID = #{orderId,jdbcType=DECIMAL},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+    where UUID = #{uuid,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select UUID, PROCESS_ID, OPERATE_STATE_DM, ORDER_ID, CREATE_TIME, UPDATE_TIME
+    from NODE_OPERATE_STATE
+    where UUID = #{uuid,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select UUID, PROCESS_ID, OPERATE_STATE_DM, ORDER_ID, CREATE_TIME, UPDATE_TIME
+    from NODE_OPERATE_STATE
+  </select>
+
+  <select id="getMaxOrderId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select MAX(ORDER_ID) ORDER_ID
+    from NODE_OPERATE_STATE
+    where PROCESS_ID = #{processId,jdbcType=VARCHAR}
+  </select>
+
+</mapper>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.admin.dao.OrgTypeMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.admin.model.OrgType">
+    <id column="ORG_TYPE_DM" jdbcType="VARCHAR" property="orgTypeDm" />
+    <result column="ORG_TYPE_MC" jdbcType="VARCHAR" property="orgTypeMc" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from ORG_TYPE
+    where ORG_TYPE_DM = #{orgTypeDm,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.admin.model.OrgType">
+    insert into ORG_TYPE (ORG_TYPE_DM, ORG_TYPE_MC)
+    values (#{orgTypeDm,jdbcType=VARCHAR}, #{orgTypeMc,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.admin.model.OrgType">
+    update ORG_TYPE
+    set ORG_TYPE_MC = #{orgTypeMc,jdbcType=VARCHAR}
+    where ORG_TYPE_DM = #{orgTypeDm,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select ORG_TYPE_DM, ORG_TYPE_MC
+    from ORG_TYPE
+    where ORG_TYPE_DM = #{orgTypeDm,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select ORG_TYPE_DM, ORG_TYPE_MC
+    from ORG_TYPE
+  </select>
+</mapper>

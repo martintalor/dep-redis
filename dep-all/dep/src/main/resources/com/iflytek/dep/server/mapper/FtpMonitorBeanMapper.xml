@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.server.mapper.FtpMonitorBeanMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.server.model.FtpMonitorBean">
+    <id column="FTP_ID" jdbcType="VARCHAR" property="ftpId" />
+    <result column="NODE_ID" jdbcType="DECIMAL" property="nodeId" />
+    <result column="MACHINE_IP" jdbcType="VARCHAR" property="machineIp" />
+    <result column="PROBE_TIME" jdbcType="VARCHAR" property="probeTime" />
+    <result column="PROBE_RESULT" jdbcType="VARCHAR" property="probeResult" />
+    <result column="SERVER_TYPE" jdbcType="VARCHAR" property="serverType" />
+  </resultMap>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.server.model.FtpMonitorBean">
+    update FTP_MONITOR
+    set PROBE_TIME = #{probeTime,jdbcType=TIMESTAMP},
+      PROBE_RESULT = #{probeResult,jdbcType=VARCHAR}
+    where FTP_ID = #{ftpId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select FTP_ID, NODE_ID, MACHINE_IP, PROBE_TIME, PROBE_RESULT, SERVER_TYPE
+    from FTP_MONITOR
+    where FTP_ID = #{ftpId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select FTP_ID, NODE_ID, MACHINE_IP, PROBE_TIME, PROBE_RESULT, SERVER_TYPE  from FTP_MONITOR
+  </select>
+  <!--查询文档服务器-->
+  <select id="selectDocServerMonitorByNodeId" resultMap="BaseResultMap">
+    select FTP_ID, NODE_ID, MACHINE_IP, PROBE_TIME, PROBE_RESULT, SERVER_TYPE  from FTP_MONITOR
+    WHERE NODE_ID=#{nodeId} AND SERVER_TYPE='01' and rownum=1
+  </select>
+  <insert id="insert" parameterType="com.iflytek.dep.server.model.FtpMonitorBean">
+    insert into FTP_MONITOR (FTP_ID, NODE_ID, MACHINE_IP, PROBE_TIME,
+      PROBE_RESULT, SERVER_TYPE)
+    values (#{ftpId,jdbcType=VARCHAR}, #{nodeId,jdbcType=VARCHAR}, #{machineIp,jdbcType=VARCHAR}, #{probeTime,jdbcType=TIMESTAMP},
+      #{probeResult,jdbcType=VARCHAR}, #{serverType,jdbcType=VARCHAR})
+  </insert>
+</mapper>

@@ -1,0 +1,11 @@
+2019.04.03
+修改 by yftao
+0. 删除多余问号 20190223_001_DEP_DDL_weiyao2
+1. 删除 20190224_002_DEP_DDL_weiyao2 节点路由关系表（老版本）
+2. 删除 20190225_003_DEP_DDL_weiyao2 物理节点路由数据初始化（老版本）
+3. 删除空行 20190227_002_DEP_DDL_xiliu5
+4. 删除空行 20190305_001_DEP_DDL_xiliu5
+5. 删除空行 20190305_002_DEP_DDL_xiliu5
+6. 删除空行 20190313_001_DEP_DDL_xiliu5
+7. 删除 20190327_001_DEP_DDL_yftao.sql
+8. 允许FOLDER_PATH  PACKAGE_PATH 为空 20190223_001_DEP_DDL_weiyao2

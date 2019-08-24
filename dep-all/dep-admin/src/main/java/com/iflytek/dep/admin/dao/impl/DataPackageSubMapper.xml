@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.admin.dao.DataPackageSubMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.admin.model.DataPackageSub">
+    <id column="SUB_PACKAGE_ID" jdbcType="VARCHAR" property="subPackageId" />
+    <result column="PACKAGE_ID" jdbcType="VARCHAR" property="packageId" />
+    <result column="PACKAGE_SIZE" jdbcType="DECIMAL" property="packageSize" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from DATA_PACKAGE_SUB
+    where SUB_PACKAGE_ID = #{subPackageId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.admin.model.DataPackageSub">
+    insert into DATA_PACKAGE_SUB (SUB_PACKAGE_ID, PACKAGE_ID, PACKAGE_SIZE, 
+      CREATE_TIME)
+    values (#{subPackageId,jdbcType=VARCHAR}, #{packageId,jdbcType=VARCHAR}, #{packageSize,jdbcType=DECIMAL}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.admin.model.DataPackageSub">
+    update DATA_PACKAGE_SUB
+    set PACKAGE_ID = #{packageId,jdbcType=VARCHAR},
+      PACKAGE_SIZE = #{packageSize,jdbcType=DECIMAL},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+    where SUB_PACKAGE_ID = #{subPackageId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select SUB_PACKAGE_ID, PACKAGE_ID, PACKAGE_SIZE, CREATE_TIME
+    from DATA_PACKAGE_SUB
+    where SUB_PACKAGE_ID = #{subPackageId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select SUB_PACKAGE_ID, PACKAGE_ID, PACKAGE_SIZE, CREATE_TIME
+    from DATA_PACKAGE_SUB
+  </select>
+  <select id="listPackageSub" parameterType="java.lang.String" resultType="com.iflytek.dep.admin.model.vo.PackageVo">
+    select PACKAGE_ID as parentId, SUB_PACKAGE_ID as packageId
+    from DATA_PACKAGE_SUB
+    where PACKAGE_ID = #{packageId,jdbcType=VARCHAR}
+  </select>
+</mapper>

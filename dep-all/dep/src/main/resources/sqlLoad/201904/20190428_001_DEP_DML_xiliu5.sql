@@ -1,0 +1,4 @@
+
+--添加索引
+create index SECTION_STEP_RECORDERS_pkg_id on SECTION_STEP_RECORDERS (PACKAGE_ID) TABLESPACE tbs_dep_idx;
+/

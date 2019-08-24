@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.admin.dao.MachineNodeMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.admin.model.MachineNode">
+    <id column="NODE_ID" jdbcType="VARCHAR" property="nodeId" />
+    <result column="MACHINE_IP" jdbcType="VARCHAR" property="machineIp" />
+    <result column="SERVER_NODE_ID" jdbcType="VARCHAR" property="serverNodeId" />
+    <result column="NODE_REMARK" jdbcType="VARCHAR" property="nodeRemark" />
+    <result column="NODE_TYPE_DM" jdbcType="VARCHAR" property="nodeTypeDm" />
+    <result column="FLAG_ENABLE" jdbcType="VARCHAR" property="flagEnable" />
+    <result column="FLAG_DELETE" jdbcType="VARCHAR" property="flagDelete" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from MACHINE_NODE
+    where NODE_ID = #{nodeId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.admin.model.MachineNode">
+    insert into MACHINE_NODE (NODE_ID, MACHINE_IP, SERVER_NODE_ID, 
+      NODE_REMARK, NODE_TYPE_DM, FLAG_ENABLE, 
+      FLAG_DELETE)
+    values (#{nodeId,jdbcType=VARCHAR}, #{machineIp,jdbcType=VARCHAR}, #{serverNodeId,jdbcType=VARCHAR}, 
+      #{nodeRemark,jdbcType=VARCHAR}, #{nodeTypeDm,jdbcType=VARCHAR}, #{flagEnable,jdbcType=VARCHAR}, 
+      #{flagDelete,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.admin.model.MachineNode">
+    update MACHINE_NODE
+    <set>
+      <if test="machineNode.machineIp != null and machineNode.machineIp != ''">
+        MACHINE_IP = #{machineNode.machineIp,jdbcType=VARCHAR},
+      </if>
+      <if test="machineNode.serverNodeId != null and machineNode.serverNodeId != ''">
+        SERVER_NODE_ID = #{machineNode.serverNodeId,jdbcType=VARCHAR},
+      </if>
+      <if test="machineNode.nodeRemark!= null and machineNode.nodeRemark != ''">
+        NODE_REMARK = #{machineNode.nodeRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="machineNode.flagEnable!= null and machineNode.flagEnable != ''">
+        FLAG_ENABLE = #{machineNode.flagEnable,jdbcType=VARCHAR}
+      </if>
+    </set>
+    where NODE_ID = #{machineNode.nodeId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select NODE_ID, MACHINE_IP, SERVER_NODE_ID, NODE_REMARK, NODE_TYPE_DM, FLAG_ENABLE, 
+    FLAG_DELETE
+    from MACHINE_NODE
+    where NODE_ID = #{nodeId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultType="com.iflytek.dep.admin.model.vo.MachineNodeVo">
+    select t.NODE_ID as nodeId,t.SERVER_NODE_ID as serverNodeId,
+    t.NODE_REMARK as nodeRemark, t.NODE_TYPE_DM as nodeTypeDm, t.FLAG_ENABLE as flagEnable,
+    t1.SERVER_NODE_NAME as serverNodeName,
+    t1.SERVER_NODE_TYPE_DM as serverNodeTypeDm,
+    f.PROBE_RESULT AS probeResult,
+    (select COUNT(ps.package_id)
+    from package_current_state ps
+    left join data_package p on p.package_id=ps.package_id
+    left join data_package_sub su on su.sub_package_id=ps.package_id
+    where ps.node_id=t.node_id and ps.send_state_dm='00' AND TO_CHAR(ps.update_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+    ) as sendNumFail,
+    (select COUNT(ps.package_id)
+    from node_send_state ns
+    inner join data_node_process ps on ps.process_id=ns.process_id
+    left join data_package p on p.package_id=ps.package_id
+    left join data_package_sub su on su.sub_package_id=ps.package_id
+    where ps.node_id=t.node_id and ns.send_state_dm='30' AND TO_CHAR(ns.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')  AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+    ) as sendNumSucc,
+    (select COUNT(ps.package_id)
+    from  node_send_state ns
+    inner join data_node_process ps on ps.process_id=ns.process_id
+    left join data_package p on p.package_id=ps.package_id
+    left join data_package_sub su on su.sub_package_id=ps.package_id
+    where ps.node_id=t.node_id and ns.send_state_dm='20' AND TO_CHAR(ns.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+    ) as totalReceive
+    from MACHINE_NODE t
+    inner join LOGICAL_SERVER_NODE t1 on t.SERVER_NODE_ID=t1.SERVER_NODE_ID
+    left join FTP_MONITOR f ON f.node_id=t.node_id and f.server_type=t.NODE_TYPE_DM
+    where 1=1
+      <if test="machineNodeDto.serverNodeTypeDm !='01'">/*非中心节点，仅查看本节点的物理节点 */
+        AND t.SERVER_NODE_ID=#{machineNodeDto.serverNodeId,jdbcType=VARCHAR}
+      </if>
+      <if test="machineNodeDto.nodeRemark != null and machineNodeDto.nodeRemark !=''">
+        AND t.NODE_REMARK LIKE CONCAT(CONCAT('%',#{machineNodeDto.nodeRemark,jdbcType=VARCHAR}),'%')
+      </if>
+      <if test="machineNodeDto.flagEnable != null and machineNodeDto.flagEnable !=''">
+        AND t.FLAG_ENABLE = #{machineNodeDto.flagEnable,jdbcType=VARCHAR}
+      </if>
+      <if test="machineNodeDto.probeResult != null and machineNodeDto.probeResult !=''"> /*只有本节点下的物理节点才能确认状态*/
+        AND t.SERVER_NODE_ID=#{machineNodeDto.serverNodeId,jdbcType=VARCHAR}
+        AND f.PROBE_RESULT = #{machineNodeDto.probeResult,jdbcType=VARCHAR}
+      </if>
+  </select>
+
+  <!--统计分支节点的收发数量-->
+  <select id="selectSendRecvStatForBranch" parameterType="java.lang.String" resultType="com.iflytek.dep.admin.model.vo.MachineNodeVo">
+    SELECT
+     '0' as sendNumFail,
+    (select COUNT(ps.package_id)
+    from node_send_state ns
+    inner join data_node_process ps on ps.process_id=ns.process_id
+    INNER JOIN MACHINE_NODE m2 on m2.node_id=ps.node_id and m2.node_type_dm='02'
+    INNER JOIN LOGICAL_SERVER_NODE l2 on l2.server_node_id=m2.server_node_id and l2.server_node_type_dm='01' /*中心节点*/
+    left join data_package p on p.package_id=ps.package_id
+    left join data_package_sub su on su.sub_package_id=ps.package_id
+    where ps.from_node_id=t.node_id and ns.send_state_dm='20' AND TO_CHAR(ns.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd')  AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+    ) as sendNumSucc,
+    (select COUNT(ps.package_id)
+    from  node_send_state ns
+    inner join data_node_process ps on ps.process_id=ns.process_id
+    INNER JOIN MACHINE_NODE m2 on m2.node_id=ps.node_id and m2.node_type_dm='02'
+    INNER JOIN LOGICAL_SERVER_NODE l2 on l2.server_node_id=m2.server_node_id and l2.server_node_type_dm='01' /*中心节点*/
+    left join data_package p on p.package_id=ps.package_id
+    left join data_package_sub su on su.sub_package_id=ps.package_id
+    where ps.to_node_id=t.node_id and ns.send_state_dm='30' AND TO_CHAR(ns.create_time,'yyyy-MM-dd')=TO_CHAR(sysdate,'yyyy-MM-dd') AND (p.package_id is not null or su.SUB_PACKAGE_ID is not null)
+    ) as totalReceive
+    from MACHINE_NODE t
+    where t.node_id=#{nodeId}
+  </select>
+
+
+  <select id="listNode" resultType="com.iflytek.dep.admin.model.vo.MachineNodeTypeVo">
+    select NODE_ID as nodeId, NODE_REMARK as nodeRemark
+    from MACHINE_NODE t
+    where 1=1
+    <if test="type != null and type !=''">
+      AND t.NODE_TYPE_DM=#{type,jdbcType=VARCHAR}
+    </if>
+  </select>
+  <select id="listNodeByServerNodeId" resultMap="BaseResultMap" parameterType="java.lang.String">
+    SELECT * FROM MACHINE_NODE WHERE SERVER_NODE_ID=#{serverNodeId}
+  </select>
+  <select id="countNode" resultType="java.lang.Integer">
+  select count(SERVER_NODE_ID) from MACHINE_NODE where SERVER_NODE_ID=#{serverNodeId,jdbcType=VARCHAR}
+  </select>
+  <select id="countNodeByOryType" resultType="com.iflytek.dep.admin.model.vo.MachineNodeCountVo">
+   select * from
+   (select count(SERVER_NODE_ID) as totalFileServer from MACHINE_NODE where SERVER_NODE_ID
+   in (select SERVER_NODE_ID from LOGICAL_SERVER_NODE where ORG_TYPE_DM= #{orgTypeDm,jdbcType=VARCHAR}) and NODE_TYPE_DM = '01'),
+   (select count(SERVER_NODE_ID) as totalFTPServer  from MACHINE_NODE where SERVER_NODE_ID
+   in (select SERVER_NODE_ID from LOGICAL_SERVER_NODE where ORG_TYPE_DM= #{orgTypeDm,jdbcType=VARCHAR}) and NODE_TYPE_DM = '02')
+  </select>
+  <select id="getServerNodeNameById" parameterType="java.lang.String"  resultType="java.lang.String">
+    select NODE_ID from MACHINE_NODE
+    where SERVER_NODE_ID = #{serverNodeId,jdbcType=VARCHAR}
+  </select>
+
+  <select id="listDocServer" parameterType="java.lang.String" resultMap="BaseResultMap">
+    SELECT * FROM machine_node where NODE_TYPE_DM='01' and SERVER_NODE_ID=#{serverNodeId}
+  </select>
+</mapper>

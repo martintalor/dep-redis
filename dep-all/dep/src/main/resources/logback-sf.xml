@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 参考文档 http://blog.csdn.net/yuyongpeng/article/details/1777892 http://www.cnblogs.com/yongze103/archive/2012/05/05/2484753.html -->
+<configuration>
+	<property name="LOG_PATTERN"
+		value="%date{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+
+	<property name="FILE_PATH"
+		value="/home/iflytek/clusterDep/logs/Cluster.SF.DepServerV06.%d{yyyy-MM-dd}.%i.log" />
+
+	<!-- 控制台输出日志 -->
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+
+	<!--每天生成一个日志文件，保存30天的日志文件。 -->
+	<appender name="rollingFile"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>
+				${FILE_PATH}
+			</fileNamePattern>
+
+			<!-- keep 30 days' worth of history -->
+			<maxHistory>30</maxHistory>
+
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- or whenever the file size reaches 100MB -->
+				<maxFileSize>100MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+
+		<encoder>
+			<pattern>${LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+
+	<!-- project default level -->
+	<logger name="com.iflytek.dep" level="INFO" />
+
+	<!--slf4j2包下的类在ERROR级别时候传递到root logger中 -->
+	<logger name="slf4j2" level="INFO" />
+
+	<!--log4jdbc -->
+	<logger name="jdbc.sqltiming" level="INFO" />
+
+	<appender name="APIAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>
+				/home/iflytek/clusterDep/logs/SF.DepServerAPIProxyV05.%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+
+			<!-- keep 30 days' worth of history -->
+			<maxHistory>30</maxHistory>
+
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- or whenever the file size reaches 100MB -->
+				<maxFileSize>100MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+
+
+
+	<logger name="com.iflytek.dep.admin.aop.APIProxy" level="INFO"
+		additivity="false">
+		<appender-ref ref="APIAppender" />
+	</logger>
+
+
+    <root level="INFO">
+		<appender-ref ref="console" /> 
+		<appender-ref ref="rollingFile" />
+	</root>
+</configuration>

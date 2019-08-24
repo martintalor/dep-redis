@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.server.mapper.NodeRouteBeanMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.server.model.NodeRouteBean">
+    <id column="LEFT_NODE_ID" jdbcType="VARCHAR" property="leftNodeId" />
+    <id column="RIGHT_NODE_ID" jdbcType="VARCHAR" property="rightNodeId" />
+    <result column="LEFT_SERVER_NODE" jdbcType="VARCHAR" property="leftServerNode" />
+    <result column="RIGHT_SERVER_NODE" jdbcType="VARCHAR" property="rightServerNode" />
+    <result column="ROUTE_TYPE" jdbcType="VARCHAR" property="routeType" />
+  </resultMap>
+  <select id="selectByPrimaryKey" parameterType="map" resultMap="BaseResultMap">
+    select LEFT_NODE_ID, RIGHT_NODE_ID, LEFT_SERVER_NODE, RIGHT_SERVER_NODE, ROUTE_TYPE
+    from NODE_ROUTE
+    where LEFT_NODE_ID = #{leftNodeId,jdbcType=VARCHAR}
+      and RIGHT_NODE_ID = #{rightNodeId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select LEFT_NODE_ID, RIGHT_NODE_ID, LEFT_SERVER_NODE, RIGHT_SERVER_NODE, ROUTE_TYPE
+    from NODE_ROUTE
+  </select>
+</mapper>

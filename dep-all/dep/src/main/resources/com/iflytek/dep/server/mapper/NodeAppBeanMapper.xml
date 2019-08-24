@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.server.mapper.NodeAppBeanMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.server.model.NodeAppBean">
+    <id column="APP_ID" jdbcType="VARCHAR" property="appId" />
+    <result column="NODE_ID" jdbcType="VARCHAR" property="nodeId" />
+    <result column="CAL_URL" jdbcType="VARCHAR" property="calUrl" />
+    <result column="APP_NAME" jdbcType="VARCHAR" property="appName" />
+    <result column="APP_REMARK" jdbcType="VARCHAR" property="appRemark" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from NODE_APP
+    where APP_ID = #{appId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.iflytek.dep.server.model.NodeAppBean">
+    insert into NODE_APP (APP_ID, NODE_ID, CAL_URL, 
+      APP_NAME, APP_REMARK)
+    values (#{appId,jdbcType=VARCHAR}, #{nodeId,jdbcType=VARCHAR}, #{calUrl,jdbcType=VARCHAR}, 
+      #{appName,jdbcType=VARCHAR}, #{appRemark,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.server.model.NodeAppBean">
+    update NODE_APP
+    set NODE_ID = #{nodeId,jdbcType=VARCHAR},
+      CAL_URL = #{calUrl,jdbcType=VARCHAR},
+      APP_NAME = #{appName,jdbcType=VARCHAR},
+      APP_REMARK = #{appRemark,jdbcType=VARCHAR}
+    where APP_ID = #{appId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select APP_ID, NODE_ID, CAL_URL, APP_NAME, APP_REMARK
+    from NODE_APP
+    where APP_ID = #{appId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select APP_ID, NODE_ID, CAL_URL, APP_NAME, APP_REMARK
+    from NODE_APP
+  </select>
+  <select id="selectByNodeIdAndAppId"  parameterType="com.iflytek.dep.server.model.NodeAppBean" resultMap="BaseResultMap">
+    select APP_ID, NODE_ID, CAL_URL, APP_NAME, APP_REMARK
+    from NODE_APP
+    where NODE_ID = #{nodeId,jdbcType=VARCHAR} and APP_ID = #{appId,jdbcType=VARCHAR}
+  </select>
+</mapper>

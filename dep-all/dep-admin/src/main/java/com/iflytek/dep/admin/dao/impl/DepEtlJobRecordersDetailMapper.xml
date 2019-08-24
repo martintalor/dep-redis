@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iflytek.dep.admin.dao.DepEtlJobRecordersDetailMapper" >
+
+    <resultMap id="BaseResultMap" type="com.iflytek.dep.admin.model.DepEtlJobRecordersDetail" >
+        <id column="ID" property="id" jdbcType="VARCHAR" />
+        <result column="PACKAGE_ID" property="packageId" jdbcType="VARCHAR" />
+        <result column="JOB_STATUS" property="jobStatus" jdbcType="DECIMAL" />
+        <result column="JOB_LOG" property="jobLog" jdbcType="CLOB" />
+        <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        ID, PACKAGE_ID, JOB_STATUS, JOB_LOG, CREATE_TIME
+    </sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select 
+        <include refid="Base_Column_List" />
+        from DEP_ETL_JOB_RECORDERS_DETAIL
+        where ID = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+        delete from DEP_ETL_JOB_RECORDERS_DETAIL
+        where ID = #{id,jdbcType=VARCHAR}
+    </delete>
+
+    <insert id="insert" parameterType="com.iflytek.dep.admin.model.DepEtlJobRecordersDetail" >
+        insert into DEP_ETL_JOB_RECORDERS_DETAIL (ID, PACKAGE_ID, JOB_STATUS, 
+            JOB_LOG, CREATE_TIME)
+        values (#{id,jdbcType=VARCHAR}, #{packageId,jdbcType=VARCHAR}, #{jobStatus,jdbcType=DECIMAL}, 
+            #{jobLog,jdbcType=CLOB}, #{createTime,jdbcType=TIMESTAMP})
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.iflytek.dep.admin.model.DepEtlJobRecordersDetail" >
+        insert into DEP_ETL_JOB_RECORDERS_DETAIL
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                ID,
+            </if>
+            <if test="packageId != null" >
+                PACKAGE_ID,
+            </if>
+            <if test="jobStatus != null" >
+                JOB_STATUS,
+            </if>
+            <if test="jobLog != null" >
+                JOB_LOG,
+            </if>
+            <if test="createTime != null" >
+                CREATE_TIME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="packageId != null" >
+                #{packageId,jdbcType=VARCHAR},
+            </if>
+            <if test="jobStatus != null" >
+                #{jobStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="jobLog != null" >
+                #{jobLog,jdbcType=CLOB},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.iflytek.dep.admin.model.DepEtlJobRecordersDetail" >
+        update DEP_ETL_JOB_RECORDERS_DETAIL
+        <set >
+            <if test="packageId != null" >
+                PACKAGE_ID = #{packageId,jdbcType=VARCHAR},
+            </if>
+            <if test="jobStatus != null" >
+                JOB_STATUS = #{jobStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="jobLog != null" >
+                JOB_LOG = #{jobLog,jdbcType=CLOB},
+            </if>
+            <if test="createTime != null" >
+                CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.admin.model.DepEtlJobRecordersDetail" >
+        update DEP_ETL_JOB_RECORDERS_DETAIL
+        set PACKAGE_ID = #{packageId,jdbcType=VARCHAR},
+            JOB_STATUS = #{jobStatus,jdbcType=DECIMAL},
+            JOB_LOG = #{jobLog,jdbcType=CLOB},
+            CREATE_TIME = #{createTime,jdbcType=TIMESTAMP}
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <select id="selectStatusNumber" resultType="java.lang.Integer" >
+        select count(0) from DEP_ETL_JOB_RECORDERS_DETAIL t
+        <where>
+            t.package_id = #{packageId,jdbcType=VARCHAR}
+            <if test="jobStatus != null">
+                and JOB_STATUS = #{jobStatus,jdbcType=NUMERIC}
+            </if>
+        </where>
+    </select>
+</mapper>

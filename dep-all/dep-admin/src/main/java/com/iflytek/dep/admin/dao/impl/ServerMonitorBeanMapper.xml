@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iflytek.dep.admin.dao.ServerMonitorBeanMapper">
+  <resultMap id="BaseResultMap" type="com.iflytek.dep.admin.model.DEPServerMonitorBean">
+    <id column="DEP_SERVER_ID" jdbcType="VARCHAR" property="depServerId" />
+    <result column="DEP_SERVER_IP" jdbcType="DECIMAL" property="depServerIp" />
+    <result column="PROBE_TIME" jdbcType="VARCHAR" property="probeTime" />
+    <result column="PROBE_RESULT" jdbcType="VARCHAR" property="probeResult" />
+  </resultMap>
+  <insert id="insert" parameterType="com.iflytek.dep.admin.model.DEPServerMonitorBean" >
+    insert into SERVER_MONITOR (DEP_SERVER_ID, DEP_SERVER_IP, PROBE_TIME, PROBE_RESULT)
+    values (#{depServerId,jdbcType=VARCHAR}, #{depServerIp,jdbcType=VARCHAR}, #{probeTime,jdbcType=TIMESTAMP}, #{probeResult,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.iflytek.dep.admin.model.DEPServerMonitorBean">
+    update SERVER_MONITOR
+    set DEP_SERVER_IP=#{depServerIp,jdbcType=VARCHAR},
+      PROBE_TIME = #{probeTime,jdbcType=TIMESTAMP},
+      PROBE_RESULT = #{probeResult,jdbcType=VARCHAR}
+    where DEP_SERVER_ID = #{depServerId,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select DEP_SERVER_ID, DEP_SERVER_IP, PROBE_TIME, PROBE_RESULT
+    from SERVER_MONITOR
+    where DEP_SERVER_ID = #{depServerId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select DEP_SERVER_ID, DEP_SERVER_IP, PROBE_TIME, PROBE_RESULT
+    from SERVER_MONITOR
+  </select>
+</mapper>
